@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <title>Dashboard Gastos Universidade</title>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-12 mt-5">
+                <h1>Dashboard Gastos Universidade</h1>
+                <p>Dashboard para guardar todos os gastos com quaisquer produtos ou coisas relacionadas com a universidade.</p>
+            </div>
+            <div class="col-12 mt-3">
+                <h2>Operações possíveis</h2>
+                <nav>
+                    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                        <a class="nav-link active" id="nav-saldo-tab" data-bs-toggle="tab" href="#nav-saldo" role="tab" aria-controls="nav-saldo" aria-selected="true">Consultar saldo</a>
+                        <a class="nav-link" id="nav-adicionar-tab" data-bs-toggle="tab" href="#nav-adicionar" role="tab" aria-controls="nav-adicionar" aria-selected="false">Adicionar gasto/depósito</a>
+                        <a class="nav-link" id="nav-consulta-tab" data-bs-toggle="tab" href="#nav-consulta" role="tab" aria-controls="nav-consulta" aria-selected="false">Consultar operações</a>
+                    </div>
+                </nav>
+                <div class="tab-content" id="nav-tabContent">
+                    <div class="tab-pane fade show active" id="nav-saldo" role="tabpanel" aria-labelledby="nav-saldo-tab">
+                        <div class="container col-13 mt-4">
+                            <h5>Saldo ainda disponível:</h5>
+                            <h3 id="saldoplaceholder"> {{ saldo }} €</h3>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="nav-adicionar" role="tabpanel" aria-labelledby="nav-adicionar-tab">
+                        <div class="container col-13 mt-4">
+                            <h5>Adicionar gasto/depósito</h5>
+                            <form>
+                                <div class="mb-3">
+                                    <label for="valor" class="form-label">Valor</label>
+                                    <input type="text" class="form-control" id="valor" placeholder="0.00 €">
+                                    <script type="text/javascript">
+                                        const input = document.getElementById('valor');
+                                        input.addEventListener('input', (event) => {
+                                            const value = event.target.value;
+                                            const cursorPosition = event.target.selectionStart;
+                                            if (value) {
+                                                const numberValue = parseFloat(value.replace(',', '.'));
+                                                if (!isNaN(numberValue)) {
+                                                    const formattedValue = `${numberValue.toFixed(2)} €`.replace(/^0+/, '');
+                                                    event.target.value = formattedValue;
+                                                    event.target.setSelectionRange(cursorPosition, cursorPosition);
+                                                }
+                                            }
+                                        });
+                                    </script>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="descricao" class="form-label">Descrição</label>
+                                    <input type="text" class="form-control" id="descricao">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="tipo" class="form-label">Tipo</label>
+                                    <select class="form-select" id="tipo">
+                                        <option selected disabled></option>
+                                        <option value="1">Gasto</option>
+                                        <option value="2">Depósito</option>
+                                    </select>
+                                </div>
+                                <button type="button" class="btn btn-primary" onclick="showSummary()">Adicionar</button>
+                                <div class="modal fade" id="summary-modal" tabindex="-1" aria-labelledby="summary-modal-label" aria-hidden="true">
+                                  <div class="modal-dialog">
+                                    <div class="modal-content">
+                                      <div class="modal-header">
+                                        <h5 class="modal-title" id="summary-modal-label">Resumo da transação</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                      </div>
+                                      <div class="modal-body" id="summary-modal-body"></div>
+                                      <div class="modal-footer">
+                                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Não</button>
+                                        <button type="button" class="btn btn-success" onclick="submitForm()">Sim</button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                                <script type="text/javascript">
+                                  function showSummary() {
+                                    const valor = document.getElementById('valor').value;
+                                    const descricao = document.getElementById('descricao').value;
+                                    const tipo = document.getElementById('tipo').value;
+                                    const summary = `
+                                      <p><b>Valor:</b> ${valor}</p>
+                                      <p><b>Descrição:</b> ${descricao}</p>
+                                      <p><b>Tipo:</b> ${tipo === '1' ? 'Gasto' : 'Depósito'}</p>
+                                      <p><b>Data:</b> ${new Date().toLocaleDateString()}</p>
+                                      <p><b>Hora:</b> ${new Date().toLocaleTimeString()}</p>
+                                      <br\>
+                                      <p>Confirma a transação?</p>
+                                    `;
+                                    const summaryModalBody = document.getElementById('summary-modal-body');
+                                    summaryModalBody.innerHTML = summary;
+                                    const summaryModal = new bootstrap.Modal(document.getElementById('summary-modal'));
+                                    summaryModal.show();
+                                  }
+                                  function submitForm() {
+                                    document.getElementById('form').submit();
+                                  }
+                                </script>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="nav-consulta" role="tabpanel" aria-labelledby="nav-consulta-tab">
+                        <div class="container col-13 mt-4">
+                            <h5>Consultar operações</h5>
+                            <form>
+                                <div class="mb-3">
+                                    <label for="datainicio" class="form-label">Data de início</label>
+                                    <input type="date" class="form-control" id="datainicio" placeholder="Data de início">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="datafim" class="form-label">Data de fim</label>
+                                    <input type="date" class="form-control" id="datafim" placeholder="Data de fim">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="tipo" class="form-label">Tipo</label>
+                                    <select class="form-select" id="tipo">
+                                        <option selected>Escolher...</option>
+                                        <option value="1">Gasto</option>
+                                        <option value="2">Depósito</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Consultar</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+</body>
+</html>
