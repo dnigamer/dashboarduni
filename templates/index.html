@@ -1,31 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <title>Dashboard Gastos Universidade</title>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style src="{{ url_for('static', path='/styles.css') }}"></style>
 </head>
+
 <body>
     <div class="container">
         <div class="row">
             <div class="col-12 mt-5">
                 <h1>Dashboard Gastos Universidade</h1>
-                <p>Dashboard para guardar todos os gastos com quaisquer produtos ou coisas relacionadas com a universidade.</p>
+                <p>Dashboard para guardar todos os gastos com quaisquer produtos ou coisas relacionadas com a
+                    universidade.</p>
             </div>
-            <div class="col-12 mt-3">
-                <h2>Operações possíveis</h2>
+            <div class="col-12 mt-4">
                 <nav>
                     <ul class="nav nav-tabs" id="nav-tab" role="tablist">
                         <li class="nav-item">
-                            <a class="nav-link" id="nav-saldo-tab" data-bs-toggle="tab" href="#nav-saldo" role="tab" aria-controls="nav-saldo" aria-selected="true">Consultar saldo</a>
+                            <a class="nav-link" id="nav-saldo-tab" data-bs-toggle="tab" href="#nav-saldo" role="tab"
+                                aria-controls="nav-saldo" aria-selected="true">Consultar saldo</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" id="nav-adicionar-tab" data-bs-toggle="tab" href="#nav-adicionar" role="tab" aria-controls="nav-adicionar" aria-selected="false">Adicionar gasto/depósito</a>
+                            <a class="nav-link" id="nav-registar-tab" data-bs-toggle="tab" href="#nav-registar"
+                                role="tab" aria-controls="nav-registar" aria-selected="false">Registar
+                                débito/crédito</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" id="nav-consulta-tab" data-bs-toggle="tab" href="#nav-consulta" role="tab" aria-controls="nav-consulta" aria-selected="false">Consultar operações</a>
+                            <a class="nav-link" id="nav-consulta-tab" data-bs-toggle="tab" href="#nav-consulta"
+                                role="tab" aria-controls="nav-consulta" aria-selected="false">Consultar operações</a>
                         </li>
                     </ul>
                 </nav>
@@ -33,17 +41,17 @@
                     <div class="tab-pane fade" id="nav-saldo" role="tabpanel" aria-labelledby="nav-saldo-tab">
                         <div class="container col-13 mt-4">
                             <h5>Saldo ainda disponível:</h5>
-                            <h3 id="saldoplaceholder"> {{ saldo }} €</h3>                                
-                            <button id="toggle-button" class="btn btn-primary">Mostrar/Esconder saldo</button> 
+                            <h3 id="saldoplaceholder"> {{ saldo }} €</h3>
+                            <button id="toggle-button" class="btn btn-primary">Mostrar/Esconder saldo</button>
                             <script>
-                                $(document).ready(function() {
+                                $(document).ready(function () {
                                     var active = localStorage.getItem("balanceActive") === "true";
                                     if (active) {
                                         $("#saldoplaceholder").text("{{ saldo }} €");
                                     } else {
                                         $("#saldoplaceholder").text("-.-- €");
                                     }
-                                    $("#toggle-button").click(function() {
+                                    $("#toggle-button").click(function () {
                                         active = !active;
                                         localStorage.setItem("balanceActive", active);
                                         if (active) {
@@ -56,24 +64,30 @@
                             </script>
                         </div>
                     </div>
-                    <div class="tab-pane fade" id="nav-adicionar" role="tabpanel" aria-labelledby="nav-adicionar-tab">
+                    <div class="tab-pane fade" id="nav-registar" role="tabpanel" aria-labelledby="nav-registar-tab">
                         <div class="container col-13 mt-4">
-                            <h5>Adicionar gasto/depósito</h5>
+                            <h5>Registar débito/crédito</h5>
                             <form>
                                 <div class="mb-3">
                                     <label for="valor" class="form-label">Valor</label>
-                                    <input type="text" class="form-control" id="valor" placeholder="0.00 €">
-                                    <script type="text/javascript">
+                                    <input type="text" class="form-control" id="valor" placeholder="0.00 €" />
+
+                                    <script>
                                         const input = document.getElementById('valor');
-                                        input.addEventListener('input', (event) => {
+                                        var verifiedInput = false;
+                                        input.addEventListener('blur', (event) => {
                                             const value = event.target.value;
-                                            const cursorPosition = event.target.selectionStart;
                                             if (value) {
                                                 const numberValue = parseFloat(value.replace(',', '.'));
                                                 if (!isNaN(numberValue)) {
                                                     const formattedValue = `${numberValue.toFixed(2)} €`.replace(/^0+/, '');
                                                     event.target.value = formattedValue;
-                                                    event.target.setSelectionRange(cursorPosition, cursorPosition);
+                                                    if (document.getElementById('valor').classList.contains('invalid-input')) {
+                                                        document.getElementById('valor').classList.remove('invalid-input');
+                                                    }
+                                                    verifiedInput = true;
+                                                } else {
+                                                    verifiedInput = false;
                                                 }
                                             }
                                         });
@@ -87,48 +101,112 @@
                                     <label for="tipo" class="form-label">Tipo</label>
                                     <select class="form-select" id="tipo">
                                         <option selected disabled></option>
-                                        <option value="1">Gasto</option>
-                                        <option value="2">Depósito</option>
+                                        <option value="1">Débito</option>
+                                        <option value="2">Crédito</option>
                                     </select>
-                                </div>
-                                <button type="button" class="btn btn-primary" onclick="showSummary()">Adicionar</button>
-                                <div class="modal fade" id="summary-modal" tabindex="-1" aria-labelledby="summary-modal-label" aria-hidden="true">
-                                  <div class="modal-dialog">
-                                    <div class="modal-content">
-                                      <div class="modal-header">
-                                        <h5 class="modal-title" id="summary-modal-label">Resumo da transação</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                      </div>
-                                      <div class="modal-body" id="summary-modal-body"></div>
-                                      <div class="modal-footer">
-                                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Não</button>
-                                        <button type="button" class="btn btn-success" onclick="submitForm()">Sim</button>
-                                      </div>
+                                </div><br />
+
+                                <button type="button" class="btn btn-primary" onclick="showSummary()">Submeter
+                                    entrada</button>
+
+                                <!-- Summary modal -->
+                                <div class="modal fade" id="summary-modal" tabindex="-1"
+                                    aria-labelledby="summary-modal-label" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="summary-modal-label">Resumo do registo</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body" id="summary-modal-body"></div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-danger"
+                                                    data-bs-dismiss="modal">Não</button>
+                                                <button type="button" class="btn btn-success"
+                                                    onclick="submitForm()">Sim</button>
+                                            </div>
+                                        </div>
                                     </div>
-                                  </div>
                                 </div>
+
+                                <!-- Incomplete form modal -->
+                                <div id="incompleteForm" class="modal fade" role="dialog">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="inc-modal-label">Informação</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body" id="inc-modal-body"></div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-success"
+                                                    data-bs-dismiss="modal">OK</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
                                 <script type="text/javascript">
-                                  function showSummary() {
-                                    const valor = document.getElementById('valor').value;
-                                    const descricao = document.getElementById('descricao').value;
-                                    const tipo = document.getElementById('tipo').value;
-                                    const summary = `
+                                    function showSummary() {
+                                        const valor = document.getElementById('valor').value;
+                                        const descricao = document.getElementById('descricao').value;
+                                        const tipo = document.getElementById('tipo').value;
+
+                                        if (valor == '' || descricao == '' || tipo == '') {
+                                            const incompleteBody = `
+                                        <h4>Erro - Campos não preenchidos</h4>
+                                        <p>Não introduziu alguns dados necessários para submeter o formulário.</p>
+                                        <p>Verifique os valores introduzidos e tente novamente.</p>
+                                        `
+                                            const incompleteModalBody = document.getElementById('inc-modal-body');
+                                            incompleteModalBody.innerHTML = incompleteBody;
+                                            $('#incompleteForm').modal('show');
+                                            return;
+                                        }
+
+                                        // check if valor is numeric and if not show a modal
+                                        if (!verifiedInput) {
+                                            const invalidBody = `
+                                        <h4>Erro - Campos com valores inválidos</h4>
+                                        <p>O campo de <b>valor</b> contém caracteres não numéricos.</p>
+                                        <p>Verifique os valores introduzidos e tente novamente.</p>
+                                        `
+                                            const invalidModalBody = document.getElementById('inc-modal-body');
+                                            invalidModalBody.innerHTML = invalidBody;
+                                            $('#incompleteForm').modal('show');
+
+                                            // set input to empty
+                                            document.getElementById('valor').value = '';
+                                            // set focus to input
+                                            document.getElementById('valor').focus();
+                                            // set red ring around valor
+                                            document.getElementById('valor').classList.add('invalid-input');
+
+                                            return;
+                                        }
+
+                                        const summary = `
                                       <p><b>Valor:</b> ${valor}</p>
                                       <p><b>Descrição:</b> ${descricao}</p>
-                                      <p><b>Tipo:</b> ${tipo === '1' ? 'Gasto' : 'Depósito'}</p>
+                                      <p><b>Tipo:</b> ${tipo === '1' ? 'Débito' : 'Crédito'}</p>
                                       <p><b>Data:</b> ${new Date().toLocaleDateString()}</p>
                                       <p><b>Hora:</b> ${new Date().toLocaleTimeString()}</p>
                                       <br\>
-                                      <p>Confirma a transação?</p>
+                                      <p>Confirma o registo?</p>
                                     `;
-                                    const summaryModalBody = document.getElementById('summary-modal-body');
-                                    summaryModalBody.innerHTML = summary;
-                                    const summaryModal = new bootstrap.Modal(document.getElementById('summary-modal'));
-                                    summaryModal.show();
-                                  }
-                                  function submitForm() {
-                                    document.getElementById('form').submit();
-                                  }
+
+                                        const summaryModalBody = document.getElementById('summary-modal-body');
+                                        summaryModalBody.innerHTML = summary;
+                                        const summaryModal = new bootstrap.Modal(document.getElementById('summary-modal'));
+                                        summaryModal.show();
+                                    }
+
+                                    function submitForm() {
+                                        document.getElementById('form').submit();
+                                    }
                                 </script>
                             </form>
                         </div>
@@ -139,7 +217,8 @@
                             <form>
                                 <div class="mb-3">
                                     <label for="datainicio" class="form-label">Data de início</label>
-                                    <input type="date" class="form-control" id="datainicio" placeholder="Data de início">
+                                    <input type="date" class="form-control" id="datainicio"
+                                        placeholder="Data de início">
                                 </div>
                                 <div class="mb-3">
                                     <label for="datafim" class="form-label">Data de fim</label>
@@ -148,9 +227,9 @@
                                 <div class="mb-3">
                                     <label for="tipo" class="form-label">Tipo</label>
                                     <select class="form-select" id="tipo">
-                                        <option selected>Escolher...</option>
-                                        <option value="1">Gasto</option>
-                                        <option value="2">Depósito</option>
+                                        <option selected disabled></option>
+                                        <option value="1">Débito</option>
+                                        <option value="2">Crédito</option>
                                     </select>
                                 </div>
                                 <button type="submit" class="btn btn-primary">Consultar</button>
@@ -161,16 +240,20 @@
             </div>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
     <script>
-        $(document).ready(function() {
+        // saves last tab opened in local storage
+        $(document).ready(function () {
             var lastTab = localStorage.getItem('lastTab');
             if (lastTab) { $('#' + lastTab).tab('show') }
             else { $('#nav-tab a:first').tab('show'); }
-            $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
+            $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
                 localStorage.setItem('lastTab', $(e.target).attr('id'));
             });
         });
     </script>
 </body>
+
 </html>
