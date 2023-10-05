@@ -46,8 +46,9 @@
                         <div class="container col-13 mt-4">
                             <h5>Saldo ainda disponível:</h5>
                             <h3 id="saldoplaceholder"></h3>
-                            
-                            <button type="button" class="btn btn-primary" id="saldoHiderBtn">Mostrar/Esconder saldo</button>
+
+                            <button type="button" class="btn btn-primary" id="saldoHiderBtn">Mostrar/Esconder
+                                saldo</button>
                             <script>
                                 $(document).ready(function () {
                                     let saldo;
@@ -60,7 +61,7 @@
                                     $.ajax({
                                         url: '/api/saldo',
                                         method: 'GET',
-                                        success: function(data) {
+                                        success: function (data) {
                                             saldo = data.saldo;
                                             if (balState) {
                                                 $("#saldoplaceholder").text(saldo + " €");
@@ -71,7 +72,7 @@
                                             }
                                             loaded = true;
                                         },
-                                        error: function() {
+                                        error: function () {
                                             console.log('Error retrieving saldo from API');
                                         }
                                     });
