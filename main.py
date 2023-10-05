@@ -32,7 +32,7 @@ cursor = db.cursor()
 if db.is_connected():
     log.light_green("database", "Connected to MySQL database")
     cursor.execute(
-        "CREATE TABLE IF NOT EXISTS `dashgastos`.`registos` (`id` INT NOT NULL AUTO_INCREMENT , `data` TEXT NOT NULL , `hora` TEXT NOT NULL , `credito` FLOAT NULL DEFAULT '0.0' , `debito` FLOAT NULL DEFAULT '0.0' , `saldo` FLOAT NOT NULL , `descricao` TEXT NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;"
+        "CREATE TABLE IF NOT EXISTS `dashgastos`.`registos` (`id` INT NOT NULL AUTO_INCREMENT , `data` TEXT NOT NULL , `credito` FLOAT NULL DEFAULT '0.0' , `debito` FLOAT NULL DEFAULT '0.0' , `saldo` FLOAT NOT NULL , `descricao` TEXT NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;"
     )
 else:
     log.red("database", "Failed to connect to MySQL database")
@@ -64,7 +64,7 @@ async def registar_api(request: Request):
     print(data)
 
     # fmt: off
-    if data["valor"] == "" or data["tipo"] == "" or data["data"] == "" or data["hora"] == "":
+    if data["valor"] == "" or data["tipo"] == "" or data["data"] == "":
         raise HTTPException(
             status_code=400,
             detail={
@@ -81,17 +81,15 @@ async def registar_api(request: Request):
     try:
         if data["tipo"] == 1: # debito
             cursor.execute(
-                "INSERT INTO registos (data, hora, debito, saldo, descricao) VALUES (%s, %s, %s, %s, %s)", (
-                    data["data"], data["hora"], data["valor"],
-                    saldo_atual - data["valor"], data["descricao"],
+                "INSERT INTO registos (data, debito, saldo, descricao) VALUES (%s, %s, %s, %s)", (
+                    data["data"], data["valor"], saldo_atual - data["valor"], data["descricao"],
                 ),
             )
             db.commit()
         elif data["tipo"] == 2: # credito
             cursor.execute(
-                "INSERT INTO registos (data, hora, credito, saldo, descricao) VALUES (%s, %s, %s, %s, %s)", (
-                    data["data"], data["hora"], data["valor"],
-                    saldo_atual + data["valor"], data["descricao"],
+                "INSERT INTO registos (data, credito, saldo, descricao) VALUES (%s, %s, %s, %s)", (
+                    data["data"], data["valor"], saldo_atual + data["valor"], data["descricao"],
                 ),
             )
             db.commit()

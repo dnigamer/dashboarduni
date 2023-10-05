@@ -138,8 +138,29 @@
                                         <option value="1">Débito</option>
                                         <option value="2">Crédito</option>
                                     </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="data" class="form-label">Data</label>
+                                    <input type="date" class="form-control" id="datePicker">
+                                    <script>
+                                        var today = new Date();
+                                        var dd = ("0" + (today.getDate())).slice(-2);
+                                        var mm = ("0" + (today.getMonth() + 1)).slice(-2);
+                                        var yyyy = today.getFullYear();
+                                        today = yyyy + '-' + mm + '-' + dd ;
+                                        $("#datePicker").attr("value", today);
+                                    </script>
                                 </div><br />
 
+                                <script>
+                                    document.getElementById("datePicker").addEventListener("keyup", function (event) {
+                                        if (event.keyCode === 13) {
+                                            event.preventDefault();
+                                            document.getElementById("submeterRegisto").click();
+                                        }
+                                    });
+                                </script>
                                 <button type="button" class="btn btn-primary" id="submeterRegisto">Submeter
                                     entrada</button>
 
@@ -188,7 +209,11 @@
                                         const descricao = document.getElementById('descricao').value;
                                         const tipo = document.getElementById('tipo').value;
 
-                                        if (valor == '' || descricao == '' || tipo == '') {
+                                        var dataBefore = document.getElementById('datePicker').value;
+                                        const dataSplit = dataBefore.split('-');
+                                        const data = `${dataSplit[2]}/${dataSplit[1]}/${dataSplit[0]}`;
+
+                                        if (valor == '' || descricao == '' || tipo == '' || data == '') {
                                             const incompleteBody = `
                                                 <h4>Erro - Campos não preenchidos</h4>
                                                 <p>Não introduziu alguns dados necessários para submeter o formulário.</p>
@@ -242,8 +267,7 @@
                                             <p><b>Valor:</b> ${valor}</p>
                                             <p><b>Descrição:</b> ${descricao}</p>
                                             <p><b>Tipo:</b> ${tipo === '1' ? 'Débito' : 'Crédito'}</p>
-                                            <p><b>Data:</b> ${new Date().toLocaleDateString()}</p>
-                                            <p><b>Hora:</b> ${new Date().toLocaleTimeString()}</p>
+                                            <p><b>Data:</b> ${data}</p>
                                             <br\>
                                             <p>Confirma o registo?</p>
                                         `;
@@ -258,8 +282,10 @@
                                         const valor = parseFloat(valorStr.replace(' €', '').replace(',', '.'));
                                         const descricao = document.getElementById('descricao').value;
                                         const tipo = parseFloat(document.getElementById('tipo').value);
-                                        const data = new Date().toLocaleDateString();
-                                        const hora = new Date().toLocaleTimeString();
+                                        
+                                        var dataBefore = document.getElementById('datePicker').value;
+                                        const dataSplit = dataBefore.split('-');
+                                        const data = `${dataSplit[2]}/${dataSplit[1]}/${dataSplit[0]}`;
 
                                         $.ajax({
                                             url: '/api/registar',
@@ -270,8 +296,7 @@
                                                 valor: valor,
                                                 descricao: descricao,
                                                 tipo: tipo,
-                                                data: data,
-                                                hora: hora
+                                                data: data
                                             }),
                                             success: function (request, text) {
                                                 localStorage.setItem('postingRecord', "success");
