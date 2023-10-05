@@ -4,7 +4,7 @@ Dashboard Gastos
 
 """
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
 
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -23,3 +23,10 @@ async def root(request: Request):
 async def saldo():
     saldo: float = 100.6
     return {"saldo": saldo}
+
+@app.post("/api/registar", response_class=JSONResponse)
+async def registar(request: Request):
+    # return with 400 error code model
+    #    raise HTTPException(status_code=400, detail={"httpCode": 400, "httpState": "Bad Request", "errorData": "Invalid data"})
+    
+    return {"state": "OK", "http_code": 200, "idRecord": 2, "successData": "hello"}
