@@ -45,24 +45,48 @@
                     <div class="tab-pane fade" id="nav-saldo" role="tabpanel" aria-labelledby="nav-saldo-tab">
                         <div class="container col-13 mt-4">
                             <h5>Saldo ainda disponível:</h5>
-                            <h3 id="saldoplaceholder"> {{ saldo }} €</h3>
-                            <button id="toggle-button" class="btn btn-primary">Mostrar/Esconder saldo</button>
+                            <h3 id="saldoplaceholder"></h3>
+                            
+                            <button type="button" class="btn btn-primary" id="saldoHiderBtn">Mostrar/Esconder saldo</button>
                             <script>
                                 $(document).ready(function () {
-                                    var active = localStorage.getItem("balanceActive") === "true";
-                                    if (active) {
-                                        $("#saldoplaceholder").text("{{ saldo }} €");
-                                    } else {
-                                        $("#saldoplaceholder").text("-.-- €");
-                                    }
-                                    $("#toggle-button").click(function () {
-                                        active = !active;
-                                        localStorage.setItem("balanceActive", active);
-                                        if (active) {
-                                            $("#saldoplaceholder").text("{{ saldo }} €");
+                                    let saldo;
+                                    var balState = localStorage.getItem("balanceActive") === "true";
+                                    var loaded = false;
+                                    var saldohiderbtn = $("#saldoHiderBtn");
+
+                                    $("#saldoplaceholder").text("A carregar...");
+
+                                    $.ajax({
+                                        url: '/api/saldo',
+                                        method: 'GET',
+                                        success: function(data) {
+                                            saldo = data.saldo;
+                                            if (balState) {
+                                                $("#saldoplaceholder").text(saldo + " €");
+                                                saldohiderbtn.html("Mostrar saldo").addClass("btn-success");
+                                            } else {
+                                                $("#saldoplaceholder").text("-.-- €");
+                                                saldohiderbtn.html("Esconder saldo").addClass("btn-danger");
+                                            }
+                                            loaded = true;
+                                        },
+                                        error: function() {
+                                            console.log('Error retrieving saldo from API');
+                                        }
+                                    });
+
+                                    saldohiderbtn.click(function () {
+                                        if (!loaded) return;
+                                        balState = !balState;
+                                        if (balState) {
+                                            saldohiderbtn.html("Mostrar saldo").removeClass("btn-danger").addClass("btn-success");
+                                            $("#saldoplaceholder").text(saldo + " €");
                                         } else {
+                                            saldohiderbtn.html("Esconder saldo").removeClass("btn-success").addClass("btn-danger");
                                             $("#saldoplaceholder").text("-.-- €");
                                         }
+                                        localStorage.setItem("balanceActive", balState);
                                     });
                                 });
                             </script>

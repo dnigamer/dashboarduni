@@ -17,5 +17,9 @@ templates = Jinja2Templates(directory="templates")
 
 @app.get("/hi", response_class=HTMLResponse)
 async def root(request: Request):
-    saldo: float = 100.5
-    return templates.TemplateResponse("index.html", {"request": request, "saldo": saldo})
+    return templates.TemplateResponse("index.html", {"request": request})
+
+@app.get("/api/saldo", response_class=JSONResponse)
+async def saldo():
+    saldo: float = 100.6
+    return {"saldo": saldo}
