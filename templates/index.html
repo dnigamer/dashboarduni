@@ -219,6 +219,25 @@
                                             return;
                                         }
 
+                                        try {
+                                            parseFloat(tipo);
+                                        } catch (error) {
+                                            const invalidBody = `
+                                                <h4>Erro - Campos com valores inválidos</h4>
+                                                <p>O campo de <b>tipo</b> tem um valor inválido ou não suportado.</p>
+                                                <p>Verifique os valores introduzidos e tente novamente.</p>
+                                            `
+                                            const invalidModalBody = document.getElementById('inf-modal-body');
+                                            invalidModalBody.innerHTML = invalidBody;
+                                            $('#informationForm').modal('show');
+
+                                            document.getElementById('tipo').value = '';
+                                            document.getElementById('tipo').focus();
+                                            document.getElementById('tipo').classList.add('invalid-input');
+
+                                            return;
+                                        }
+
                                         const summary = `
                                             <p><b>Valor:</b> ${valor}</p>
                                             <p><b>Descrição:</b> ${descricao}</p>
@@ -235,18 +254,25 @@
                                     }
 
                                     function submitForm() {
-                                        const valor = document.getElementById('valor').value;
+                                        let valorStr = document.getElementById('valor').value;
+                                        const valor = parseFloat(valorStr.replace(' €', '').replace(',', '.'));
                                         const descricao = document.getElementById('descricao').value;
-                                        const tipo = document.getElementById('tipo').value;
+                                        const tipo = parseFloat(document.getElementById('tipo').value);
+                                        const data = new Date().toLocaleDateString();
+                                        const hora = new Date().toLocaleTimeString();
 
                                         $.ajax({
                                             url: '/api/registar',
                                             method: 'POST',
-                                            data: {
+                                            contentType: 'application/json',
+                                            dataType: 'json',
+                                            data: JSON.stringify({
                                                 valor: valor,
                                                 descricao: descricao,
-                                                tipo: tipo
-                                            },
+                                                tipo: tipo,
+                                                data: data,
+                                                hora: hora
+                                            }),
                                             success: function (request, text) {
                                                 localStorage.setItem('postingRecord', "success");
                                                 const jsonData = JSON.stringify(request);

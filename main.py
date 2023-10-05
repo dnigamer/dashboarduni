@@ -27,8 +27,13 @@ db = mysql.connector.connect(
     database=secrets["database"],
 )
 
+cursor = db.cursor()
+
 if db.is_connected():
     log.light_green("database", "Connected to MySQL database")
+    cursor.execute(
+        "CREATE TABLE IF NOT EXISTS `dashgastos`.`registos` (`id` INT NOT NULL AUTO_INCREMENT , `data` TEXT NOT NULL , `hora` TEXT NOT NULL , `credito` FLOAT NULL DEFAULT '0.0' , `debito` FLOAT NULL DEFAULT '0.0' , `saldo` FLOAT NOT NULL , `descricao` TEXT NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;"
+    )
 else:
     log.red("database", "Failed to connect to MySQL database")
 
@@ -66,6 +71,34 @@ async def registar_api(request: Request):
         )
     # fmt: on
 
+    cursor.execute("SELECT saldo FROM registos ORDER BY id DESC LIMIT 1")
+    saldo_atual: float = cursor.fetchone()[0]
+
+    try:
+        if data["tipo"] == 1:
+            cursor.execute(
+                "INSERT INTO registos (data, hora, debito, saldo, descricao) VALUES (%s, %s, %s, %s, %s)",
+                (data["data"], data["hora"], data["valor"], saldo_atual-data["valor"], data["descricao"]),
+            )
+            db.commit()
+        elif data["tipo"] == 2:
+            cursor.execute(
+                "INSERT INTO registos (data, hora, credito, saldo, descricao) VALUES (%s, %s, %s, %s, %s)",
+                (data["data"], data["hora"], data["valor"], saldo_atual+data["valor"], data["descricao"]),
+            )
+            db.commit()
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "httpCode": 500,
+                "httpState": "Internal Server Error",
+                "errorData": str(e),
+            },
+        )
+
+    cursor.execute("SELECT id FROM registos ORDER BY id DESC LIMIT 1")
     return JSONResponse(
-        status_code=200, content={"httpCode": 200, "httpState": "OK", "idRecord": 1}
+        status_code=200,
+        content={"httpCode": 200, "httpState": "OK", "idRecord": cursor.fetchone()[0]},
     )
