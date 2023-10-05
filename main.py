@@ -50,8 +50,12 @@ async def root(request: Request):
 
 @app.get("/api/saldo", response_class=JSONResponse)
 async def saldo_api():
-    saldo: float = 100.6
-    return {"saldo": saldo}
+    cursor.execute("SELECT saldo FROM registos ORDER BY id DESC LIMIT 1")
+    saldo: float = cursor.fetchone()[0]
+    return JSONResponse(
+        status_code=200,
+        content={"httpCode": 200, "httpState": "OK", "saldo": saldo},
+    )
 
 
 @app.post("/api/registar", response_class=JSONResponse)
