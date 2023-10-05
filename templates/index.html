@@ -72,8 +72,11 @@
                                             }
                                             loaded = true;
                                         },
-                                        error: function () {
+                                        error: function (request, status, error) {
                                             console.log('Error retrieving saldo from API');
+                                            console.log(request.responseText);
+                                            $("#saldoplaceholder").text("N/D €");
+                                            saldohiderbtn.html("Erro ao obter saldo").addClass("btn-secondary");
                                         }
                                     });
 
