@@ -75,16 +75,20 @@ async def registar_api(request: Request):
     saldo_atual: float = cursor.fetchone()[0]
 
     try:
-        if data["tipo"] == 1:
+        if data["tipo"] == 1: # debito
             cursor.execute(
-                "INSERT INTO registos (data, hora, debito, saldo, descricao) VALUES (%s, %s, %s, %s, %s)",
-                (data["data"], data["hora"], data["valor"], saldo_atual-data["valor"], data["descricao"]),
+                "INSERT INTO registos (data, hora, debito, saldo, descricao) VALUES (%s, %s, %s, %s, %s)", (
+                    data["data"], data["hora"], data["valor"],
+                    saldo_atual - data["valor"], data["descricao"],
+                ),
             )
             db.commit()
-        elif data["tipo"] == 2:
+        elif data["tipo"] == 2: # credito
             cursor.execute(
-                "INSERT INTO registos (data, hora, credito, saldo, descricao) VALUES (%s, %s, %s, %s, %s)",
-                (data["data"], data["hora"], data["valor"], saldo_atual+data["valor"], data["descricao"]),
+                "INSERT INTO registos (data, hora, credito, saldo, descricao) VALUES (%s, %s, %s, %s, %s)", (
+                    data["data"], data["hora"], data["valor"],
+                    saldo_atual + data["valor"], data["descricao"],
+                ),
             )
             db.commit()
     except Exception as e:
