@@ -32,6 +32,10 @@
                                 débito/crédito</a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link" id="nav-editar-tab" data-bs-toggle="tab" href="#nav-editar" role="tab"
+                                aria-controls="nav-editar" aria-selected="false">Editar registo</a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" id="nav-consulta-tab" data-bs-toggle="tab" href="#nav-consulta"
                                 role="tab" aria-controls="nav-consulta" aria-selected="false">Consultar operações</a>
                         </li>
@@ -148,7 +152,7 @@
                                         var dd = ("0" + (today.getDate())).slice(-2);
                                         var mm = ("0" + (today.getMonth() + 1)).slice(-2);
                                         var yyyy = today.getFullYear();
-                                        today = yyyy + '-' + mm + '-' + dd ;
+                                        today = yyyy + '-' + mm + '-' + dd;
                                         $("#datePicker").attr("value", today);
                                     </script>
                                 </div><br />
@@ -282,7 +286,7 @@
                                         const valor = parseFloat(valorStr.replace(' €', '').replace(',', '.'));
                                         const descricao = document.getElementById('descricao').value;
                                         const tipo = parseFloat(document.getElementById('tipo').value);
-                                        
+
                                         var dataBefore = document.getElementById('datePicker').value;
                                         const dataSplit = dataBefore.split('-');
                                         const data = `${dataSplit[2]}/${dataSplit[1]}/${dataSplit[0]}`;
@@ -318,6 +322,136 @@
 
                                     $("#submeterRegisto").click(function () {
                                         showSummary();
+                                    });
+                                </script>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="nav-editar" role="tabpanel" aria-labelledby="nav-editar-tab">
+                        <div class="container col-13 mt-4">
+                            <h5>Editar registo</h5>
+                            <form>
+                                <div class="mb-3">
+                                    <label for="data" class="form-label">Data</label>
+                                    <input type="date" class="form-control" id="datePickerEdit">
+                                    <script>
+                                        var today = new Date();
+                                        var dd = ("0" + (today.getDate())).slice(-2);
+                                        var mm = ("0" + (today.getMonth() + 1)).slice(-2);
+                                        var yyyy = today.getFullYear();
+                                        today = yyyy + '-' + mm + '-' + dd;
+                                        $("#datePickerEdit").attr("value", today);
+                                    </script>
+                                </div><br />
+
+                                <h5 id="editTableTitle" hidden></h5>
+                                <table class="table table-sm" id="editTable" hidden>
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Valor</th>
+                                            <th>Descrição</th>
+                                            <th>Tipo</th>
+                                            <th>Data</th>
+                                            <th>Editar</th>
+                                            <th>Eliminar</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recordsTableBody">
+                                        <tr></tr>
+                                    </tbody>
+                                </table><br />
+
+                                <button type="submit" class="btn btn-primary" id="dataEditBtn">Procurar
+                                    registos</button>
+
+                                <script>
+                                    function getRecords() {
+                                        var dataBefore = document.getElementById('datePickerEdit').value;
+                                        const dataSplit = dataBefore.split('-');
+                                        const dataEdit = `${dataSplit[2]}/${dataSplit[1]}/${dataSplit[0]}`;
+
+                                        $.ajax({
+                                            url: '/api/consulta',
+                                            method: 'POST',
+                                            contentType: 'application/json',
+                                            dataType: 'json',
+                                            data: JSON.stringify({
+                                                dataConsulta: dataEdit,
+                                            }),
+                                            success: function (response) {
+                                                if (response['data'].length == 0) {
+                                                    document.getElementById('editTable').hidden = true;
+                                                    document.getElementById('recordsTableBody').innerHTML = '';
+                                                    document.getElementById('editTableTitle').hidden = false;
+                                                    document.getElementById('editTableTitle').innerHTML = `Nenhum registo encontrado para a data ${dataEdit}.`;
+                                                    return;
+                                                }
+
+                                                // show table
+                                                document.getElementById('editTableTitle').hidden = false;
+                                                if (response['data'].length == 1) {
+                                                    document.getElementById('editTableTitle').innerHTML = `${response['data'].length} registo encontrado para a data ${dataEdit}.`;
+                                                } else {
+                                                    document.getElementById('editTableTitle').innerHTML = `${response['data'].length} registos encontrados para a data ${dataEdit}.`;
+                                                }
+                                                document.getElementById('editTable').hidden = false;
+
+                                                // clear table
+                                                document.getElementById('recordsTableBody').innerHTML = '';
+
+                                                // add rows to table
+                                                for (var i = 0; i < response['data'].length; i++) {
+                                                    var row = `<tr>
+                                                        <td>${response['data'][i]['id']}</td>
+                                                        <td>${response['data'][i]['valor']} €</td>
+                                                        <td>${response['data'][i]['descricao']}</td>
+                                                        <td>${response['data'][i]['tipo'] == 1 ? 'Débito' : 'Crédito'}</td>
+                                                        <td>${response['data'][i]['data']}</td>
+                                                        <td><button type="button" class="btn btn-primary" onclick="editRecord(${response['data'][i]['id']})" disabled>
+                                                            <svg
+                                                                xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                                fill="currentColor" class="bi bi-pencil-square"
+                                                                viewBox="0 0 16 16">
+                                                                <path
+                                                                    d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                                                                <path fill-rule="evenodd"
+                                                                    d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
+                                                            </svg>
+                                                            </button></td>
+                                                        <td><button type="button" class="btn btn-primary" onclick="deleteRecord(${response['data'][i]['id']})" disabled>
+                                                            <svg
+                                                                xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+                                                                fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                                                                <path
+                                                                    d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z" />
+                                                                <path
+                                                                    d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z" />
+                                                            </svg>
+                                                            </button></td>
+                                                        `;
+
+                                                    row += `</tr>`;
+                                                    document.getElementById('recordsTableBody').innerHTML += row;
+                                                }
+                                            },
+                                            error: function (xhr, status, error) {
+                                                // handle error response
+                                                console.log(xhr.responseText);
+                                            }
+                                        });
+                                    }
+
+                                    function editRecord(id) {
+                                        console.log("Editing record with ID " + id);
+                                    }
+
+                                    function deleteRecord(id) {
+                                        console.log("Deleting record with ID " + id);
+                                    }
+
+                                    $('#dataEditBtn').click(function () {
+                                        getRecords();
                                     });
                                 </script>
                             </form>
