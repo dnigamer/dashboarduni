@@ -32,7 +32,7 @@ cursor = db.cursor()
 if db.is_connected():
     log.light_green("database", "Connected to MySQL database")
     cursor.execute(
-        "CREATE TABLE IF NOT EXISTS `dashgastos`.`registos` (`id` INT NOT NULL AUTO_INCREMENT , `data` TEXT NOT NULL , `credito` FLOAT NULL DEFAULT '0.0' , `debito` FLOAT NULL DEFAULT '0.0' , `saldo` FLOAT NOT NULL , `descricao` TEXT NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;"
+        f"CREATE TABLE IF NOT EXISTS `{secrets['database']}`.`registos` (`id` INT NOT NULL AUTO_INCREMENT, `data` TEXT NOT NULL, `valor` FLOAT NOT NULL DEFAULT '0.0', `tipo` FLOAT NOT NULL DEFAULT '0.0', `descricao` TEXT NOT NULL DEFAULT '', PRIMARY KEY (`id`)) ENGINE = InnoDB;"
     )
 else:
     log.red("database", "Failed to connect to MySQL database")
@@ -86,30 +86,15 @@ async def registar_api(request: Request):
                 "errorData": "Missing parameters.",
             },
         )
-    # fmt: on
 
-    cursor.execute("SELECT saldo FROM registos ORDER BY id DESC LIMIT 1")
-    saldo_atual: float = cursor.fetchone()[0]
-    
-    """
+
     try:
-        if data["tipo"] == 1:  # debito
-            cursor.execute(
-                "INSERT INTO registos (data, debito, saldo, descricao) VALUES (%s, %s, %s, %s)",
-                (
-                    data["data"],
-                    data["valor"],
-                    saldo_atual - data["valor"],
-                    data["descricao"],
-                ),
-            )
-            db.commit()
-        elif data["tipo"] == 2:  # credito
-            cursor.execute(
-                "INSERT INTO registos (data, credito, saldo, descricao) VALUES (%s, %s, %s, %s)",
-                (data["data"], data["valor"], saldo_atual + data["valor"], data["descricao"], ),
-            )
-            db.commit()
+        cursor.execute(
+            "INSERT INTO registos (data, valor, tipo, descricao) VALUES (%s, %s, %s, %s)",
+            (data["data"], data["valor"], data["tipo"], data["descricao"]),
+        )
+        # fmt: on
+        db.commit()
     except Exception as e:
         raise HTTPException(
             status_code=500,
@@ -119,7 +104,6 @@ async def registar_api(request: Request):
                 "errorData": str(e),
             },
         )
-    """
 
     cursor.execute("SELECT id FROM registos ORDER BY id DESC LIMIT 1")
     return JSONResponse(
