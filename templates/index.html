@@ -352,6 +352,26 @@
                                 </div>
                             </div>
 
+                            <!-- Confirmation modal -->
+                            <div id="confirmEditModal" class="modal fade" role="dialog">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="confirmEditModal-modal-title">Apagar registo - Confirmação</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body" id="confirmEditModal-modal-body"></div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-danger"
+                                                data-bs-dismiss="modal">Não</button>
+                                            <button type="button" class="btn btn-success" id="confirmEditModal-body-YesBtn"
+                                                data-bs-dismiss="modal">Sim</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- Edit form modal (for general use in errors or success) -->
                             <div id="trueEditModal" class="modal fade" role="dialog">
                                 <div class="modal-dialog">
@@ -552,7 +572,7 @@
                                                                     d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z" />
                                                             </svg>
                                                             </button></td>
-                                                        <td><button type="button" class="btn btn-primary" onclick="deleteRecord(${response['data'][i]['id']})" disabled>
+                                                        <td><button type="button" class="btn btn-primary" onclick="deleteRecord(${response['data'][i]['id']})">
                                                             <svg
                                                                 xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                                                 fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
@@ -725,6 +745,47 @@
 
                                     function deleteRecord(id) {
                                         console.log("Deleting record with ID " + id);
+
+                                        const confirmBody = `
+                                            <p>Tem a certeza que pretende apagar o registo com o ID <b>${id}</b>?</p>
+                                        `
+                                        const confirmModalBody = document.getElementById('confirmEditModal-modal-body');
+                                        confirmModalBody.innerHTML = confirmBody;
+                                        $('#confirmEditModal').modal('show');
+
+                                        $('#confirmEditModal-body-YesBtn').click(function () {
+                                            $.ajax({
+                                                url: `/api/apagar/${id}`,
+                                                method: 'DELETE',
+                                                contentType: 'application/json',
+                                                dataType: 'json',
+                                                success: function (response) {
+                                                    const successBody = `
+                                                        <h4>Registo ID: <b>${id}</b> apagado com sucesso</h4>
+                                                        <p>O registo foi apagado com sucesso.</p>
+                                                        <p>Por favor clique em OK para atualizar a tabela.</p>
+                                                    `
+                                                    const successModalBody = document.getElementById('infEditModal-modal-body');
+                                                    successModalBody.innerHTML = successBody;
+                                                    $('#infEditModal').modal('show');
+
+                                                    $('#infEditModal-body-OKBtn').click(function () {
+                                                        location.reload();
+                                                    });
+                                                },
+                                                error: function (xhr, status, error) {
+                                                    const errAPIFetchEditModalBodyHtml = `
+                                                        <h4>Erro - Problema ao enviar dados para a API</h4>
+                                                        <p>Ocorreu um erro interno ao enviar dados do registo apagado para a API.</p>
+                                                        <p>Por favor tente novamente mais tarde.<br/> Se o problema persistir, contacte o administrador.</p>
+                                                        <p><b>Informação técnica:</b> ${xhr.responseText}</p>
+                                                    `
+                                                    const errAPIFetchEditModalBody = document.getElementById('infEditModal-modal-body');
+                                                    errAPIFetchEditModalBody.innerHTML = errAPIFetchEditModalBodyHtml;
+                                                    $('#infEditModal').modal('show');
+                                                }
+                                            });
+                                        });
                                     }
 
                                     $('#dataEditBtn').click(function () {

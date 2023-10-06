@@ -87,7 +87,6 @@ async def registar_api(request: Request):
             },
         )
 
-
     try:
         cursor.execute(
             "INSERT INTO registos (data, valor, tipo, descricao) VALUES (%s, %s, %s, %s)",
@@ -219,4 +218,28 @@ async def consultar_single_api(id: int):
     return JSONResponse(
         status_code=200,
         content={"httpCode": 200, "httpState": "OK", "data": jsondata},
+    )
+
+
+@app.delete("/api/apagar/{id}", response_class=JSONResponse)
+async def apagar_api(id: int):
+    try:
+        cursor.execute(
+            "DELETE FROM registos WHERE `id` = %s;", (id, ),
+        )
+        db.commit()
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "httpCode": 500,
+                "httpState": "Internal Server Error",
+                "errorData": str(e),
+            },
+        )
+
+    return JSONResponse(
+        status_code=200,
+        content={"httpCode": 200, "httpState": "OK"},
     )
