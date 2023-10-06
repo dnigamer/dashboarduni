@@ -112,10 +112,38 @@ async def registar_api(request: Request):
     )
 
 
-@app.post("/api/editar/{id}", response_class=JSONResponse)
-async def editar_api(id: int):
-    cursor.execute("SELECT * FROM registos WHERE id = %s", (id,))
-    data = cursor.fetchone()
+@app.put("/api/editar/{id}", response_class=JSONResponse)
+async def editar_api(request: Request, id: int):
+    data = await request.json()
+
+    # fmt: off
+    if data["valor"] == "" or data["tipo"] == "" or data["data"] == "":
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "httpCode": 400,
+                "httpState": "Bad Request",
+                "errorData": "Missing parameters.",
+            },
+        )
+    
+    try:
+        cursor.execute(
+            "UPDATE registos SET data = %s, valor = %s, tipo = %s, descricao = %s WHERE id = %s",
+            (data["data"], data["valor"], data["tipo"], data["descricao"], id),
+        )
+        # fmt: on
+        db.commit()
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "httpCode": 500,
+                "httpState": "Internal Server Error",
+                "errorData": str(e),
+            },
+        )
+
 
     return JSONResponse(
         status_code=200,
@@ -130,6 +158,41 @@ async def consultar_api(request: Request):
     try:
         cursor.execute(
             "SELECT * FROM registos WHERE `data` = %s", (data["dataConsulta"],)
+        )
+        registos = cursor.fetchall()
+
+        jsondata = []
+        for i in range(len(registos)):
+            jsondata.append({
+                    "id": registos[i][0],
+                    "data": str(registos[i][1]),
+                    "valor": str(registos[i][2]),
+                    "tipo": registos[i][3],
+                    "descricao": str(registos[i][4]),
+                })
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "httpCode": 500,
+                "httpState": "Internal Server Error",
+                "errorData": str(e),
+            },
+        )
+
+    return JSONResponse(
+        status_code=200,
+        content={"httpCode": 200, "httpState": "OK", "data": jsondata},
+    )
+
+
+@app.post("/api/consulta/{id}", response_class=JSONResponse)
+async def consultar_single_api(id: int):
+
+    try:
+        cursor.execute(
+            "SELECT * FROM registos WHERE `id` = %s;", (id, ),
         )
         registos = cursor.fetchall()
 
