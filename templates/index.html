@@ -357,7 +357,8 @@
                                 <div class="modal-dialog">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h5 class="modal-title" id="confirmEditModal-modal-title">Apagar registo - Confirmação</h5>
+                                            <h5 class="modal-title" id="confirmEditModal-modal-title">Apagar registo -
+                                                Confirmação</h5>
                                             <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                 aria-label="Close"></button>
                                         </div>
@@ -365,8 +366,8 @@
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-danger"
                                                 data-bs-dismiss="modal">Não</button>
-                                            <button type="button" class="btn btn-success" id="confirmEditModal-body-YesBtn"
-                                                data-bs-dismiss="modal">Sim</button>
+                                            <button type="button" class="btn btn-success"
+                                                id="confirmEditModal-body-YesBtn" data-bs-dismiss="modal">Sim</button>
                                         </div>
                                     </div>
                                 </div>
@@ -604,6 +605,8 @@
                                             contentType: 'application/json',
                                             dataType: 'json',
                                             success: function (response) {
+                                                let finish = false;
+
                                                 const valorBefore = response['data'][0]['valor'];
                                                 const numberParsBefore = parseFloat(valorBefore.replace(',', '.'));
 
@@ -633,6 +636,10 @@
                                                     var dataBefore = document.getElementById('trueEditModal-body-dataEdit').value;
                                                     const dataSplit = dataBefore.split('-');
                                                     const dataEdit = `${dataSplit[2]}/${dataSplit[1]}/${dataSplit[0]}`;
+
+                                                    $("#infEditModal-body-OKBtn").click(function () {
+                                                        if (finish != true) $("#trueEditModal").modal("show");
+                                                    });
 
                                                     // verifies existence of all inputs
                                                     if (valorEditBefore == '' || descricaoEdit == '' || tipoEdit == '' || dataEdit == '') {
@@ -667,8 +674,7 @@
                                                         invalidEditModalBody.innerHTML = invalidEditBody;
                                                         $('#infEditModal').modal('show');
 
-                                                        document.getElementById('trueEditModal-body-valorEdit').value = '';
-                                                        document.getElementById('trueEditModal-body-valorEdit').focus();
+                                                        document.getElementById('trueEditModal-body-valorEdit').value = `${numberParsBefore.toFixed(2)} €`.replace(/^0+/, '');
                                                         document.getElementById('trueEditModal-body-valorEdit').classList.add('invalid-input');
 
                                                         return;
@@ -686,6 +692,8 @@
                                                         const invalidEditModalBody = document.getElementById('infEditModal-modal-body');
                                                         invalidEditModalBody.innerHTML = invalidEditBody;
                                                         $('#infEditModal').modal('show');
+
+                                                        return;
                                                     }
 
                                                     // PUT request to API to edit record
@@ -704,10 +712,15 @@
                                                             const successBody = `
                                                                 <h4>Registo editado com sucesso</h4>
                                                                 <p>O registo foi editado com sucesso.</p>
+                                                                <p>Por favor clique em OK para atualizar a tabela.</p>
                                                             `
                                                             const successModalBody = document.getElementById('infEditModal-modal-body');
                                                             successModalBody.innerHTML = successBody;
+
                                                             $('#infEditModal').modal('show');
+
+                                                            finish = true;
+
 
                                                             $('#infEditModal-body-OKBtn').click(function () {
                                                                 localStorage.setItem('editRecordNext', "getRecords");
