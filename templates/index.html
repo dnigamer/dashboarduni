@@ -174,7 +174,7 @@
                                     <div class="modal-dialog">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h5 class="modal-title" id="summary-modal-label">Resumo do registo</h5>
+                                                <h5 class="modal-title" id="summary-modal-label">Registar débito/crédito - Resumo</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                     aria-label="Close"></button>
                                             </div>
@@ -194,7 +194,7 @@
                                     <div class="modal-dialog">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h5 class="modal-title" id="inf-modal-label">Informação</h5>
+                                                <h5 class="modal-title" id="inf-modal-label">Registar débito/crédito - Informação</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                     aria-label="Close"></button>
                                             </div>
@@ -329,6 +329,25 @@
                     </div>
                     <div class="tab-pane fade" id="nav-editar" role="tabpanel" aria-labelledby="nav-editar-tab">
                         <div class="container col-13 mt-4">
+
+                            <!-- Information form modal (for general use in errors or success) -->
+                            <div id="incEditModal" class="modal fade" role="dialog">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="incEdit-modal-label">Informação - Editar registo</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body" id="incEdit-modal-body"></div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-success"
+                                                data-bs-dismiss="modal">OK</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <h5>Editar registo</h5>
                             <form>
                                 <div class="mb-3">
@@ -370,6 +389,19 @@
                                         var dataBefore = document.getElementById('datePickerEdit').value;
                                         const dataSplit = dataBefore.split('-');
                                         const dataEdit = `${dataSplit[2]}/${dataSplit[1]}/${dataSplit[0]}`;
+
+                                        if (dataBefore == '') {
+                                            const incDateModalBodyHtml = `
+                                                <h4>Erro - Valor de data inválido</h4>
+                                                <p>O valor introduzido para a data é inválido.</p>
+                                                <p>Verifique os valores introduzidos e tente novamente.</p>
+                                            `
+                                            const incDateModalBody = document.getElementById('incEdit-modal-body');
+                                            incDateModalBody.innerHTML = incDateModalBodyHtml;
+                                            $('#incEditModal').modal('show');
+
+                                            return;
+                                        }
 
                                         $.ajax({
                                             url: '/api/consulta',
