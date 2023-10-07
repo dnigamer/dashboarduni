@@ -112,8 +112,10 @@
                   $("#editTable").hide();
                 } else if (target == "#nav-consulta") {
                   $("#datasPredConsulta").val("");
-                  $("#recordsConsultaTableTitle").text("");
-                  $("#recordsConsultaTable").hide();
+                  $("#tipoConsulta").val("");
+                  document.getElementById("recordsConsultaTable").hidden = true;
+                  document.getElementById("recordsConsultaTableBody").value = "";
+                  document.getElementById("recordsConsultaTableTitle").hidden = true;
                 }
               });
             </script>
