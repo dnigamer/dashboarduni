@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS `dashgastos`.`registos` (
     `id` INT NOT NULL AUTO_INCREMENT,
     `data` TEXT NOT NULL,
     `valor` FLOAT NOT NULL DEFAULT '0.0',
-    `tipo` FLOAT NOT NULL DEFAULT '0.0',
+    `tipo` INT NOT NULL DEFAULT '0',
     `descricao` TEXT NOT NULL DEFAULT '',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB;

@@ -809,29 +809,270 @@
                         </div>
                     </div>
                     <div class="tab-pane fade" id="nav-consulta" role="tabpanel" aria-labelledby="nav-consulta-tab">
+
+                        <!-- Information form modal (for general use in errors or success) -->
+                        <div id="infConsIntervalo" class="modal fade" role="dialog">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="infConsIntervalo-modal-label">Informação - Consultar
+                                            operações
+                                        </h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body" id="infConsIntervalo-modal-body"></div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-success" data-bs-dismiss="modal"
+                                            id="infConsIntervalo-body-OKBtn">OK</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="container col-13 mt-4">
                             <h5>Consultar operações</h5>
                             <form>
                                 <div class="mb-3">
-                                    <label for="datainicio" class="form-label">Data de início</label>
-                                    <input type="date" class="form-control" id="datainicio"
-                                        placeholder="Data de início">
+                                    <label for="datasPredConsulta" class="form-label">Data</label>
+                                    <select class="form-select" id="datasPredConsulta">
+                                        <option selected disabled></option>
+                                        <option value="1">Hoje</option>
+                                        <option value="2">Ontem</option>
+                                        <option value="3">Últimos 7 dias</option>
+                                        <option value="4">Últimos 30 dias</option>
+                                        <option value="5">Este mês</option>
+                                        <option value="6">Mês anterior</option>
+                                        <option value="7">Personalizado</option>
+                                    </select>
+                                </div>
+
+                                <script>
+                                    $("#datasPredConsulta").change(function () {
+                                        const value = document.getElementById('datasPredConsulta').value;
+
+                                        if (value == 7) {
+                                            document.getElementById('dataInicioLblConsulta').hidden = false;
+                                            document.getElementById('dataFimLblConsulta').hidden = false;
+                                            document.getElementById('dataInicioConsulta').hidden = false;
+                                            document.getElementById('dataFimConsulta').hidden = false;
+                                        } else {
+                                            document.getElementById('dataInicioLblConsulta').hidden = true;
+                                            document.getElementById('dataFimLblConsulta').hidden = true;
+                                            document.getElementById('dataInicioConsulta').hidden = true;
+                                            document.getElementById('dataFimConsulta').hidden = true;
+                                        }
+
+                                        if (value == 1) {
+                                            let today = new Date();
+                                            let dd = ("0" + (today.getDate())).slice(-2);
+                                            let mm = ("0" + (today.getMonth() + 1)).slice(-2);
+                                            let yyyy = today.getFullYear();
+                                            let todayDate = `${yyyy}-${mm}-${dd}`;
+                                            document.getElementById('dataInicioConsulta').value = todayDate;
+                                            document.getElementById('dataFimConsulta').value = todayDate;
+                                        } else if (value == 2) {
+                                            let today = new Date();
+                                            let dd = ("0" + (today.getDate() - 1)).slice(-2);
+                                            let mm = ("0" + (today.getMonth() + 1)).slice(-2);
+                                            let yyyy = today.getFullYear();
+                                            let todayDate = `${yyyy}-${mm}-${dd}`;
+                                            document.getElementById('dataInicioConsulta').value = todayDate;
+                                            document.getElementById('dataFimConsulta').value = todayDate;
+                                        } else if (value == 3) {
+                                            let today = new Date();
+                                            let dd = ("0" + (today.getDate())).slice(-2);
+                                            let mm = ("0" + (today.getMonth() + 1)).slice(-2);
+                                            let yyyy = today.getFullYear();
+                                            let todayDate = `${yyyy}-${mm}-${dd}`;
+                                            document.getElementById('dataFimConsulta').value = todayDate;
+
+                                            let sevenDaysAgo = new Date();
+                                            sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+                                            let dd7 = ("0" + (sevenDaysAgo.getDate())).slice(-2);
+                                            let mm7 = ("0" + (sevenDaysAgo.getMonth() + 1)).slice(-2);
+                                            let yyyy7 = sevenDaysAgo.getFullYear();
+                                            let sevenDaysAgoDate = `${yyyy7}-${mm7}-${dd7}`;
+                                            document.getElementById('dataInicioConsulta').value = sevenDaysAgoDate;
+                                        } else if (value == 4) {
+                                            let today = new Date();
+                                            let dd = ("0" + (today.getDate())).slice(-2);
+                                            let mm = ("0" + (today.getMonth() + 1)).slice(-2);
+                                            let yyyy = today.getFullYear();
+                                            let todayDate = `${yyyy}-${mm}-${dd}`;
+                                            document.getElementById('dataFimConsulta').value = todayDate;
+
+                                            let thirtyDaysAgo = new Date();
+                                            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+                                            let dd30 = ("0" + (thirtyDaysAgo.getDate())).slice(-2);
+                                            let mm30 = ("0" + (thirtyDaysAgo.getMonth() + 1)).slice(-2);
+                                            let yyyy30 = thirtyDaysAgo.getFullYear();
+                                            let thirtyDaysAgoDate = `${yyyy30}-${mm30}-${dd30}`;
+                                            document.getElementById('dataInicioConsulta').value = thirtyDaysAgoDate;
+                                        } else if (value == 5) {
+                                            let today = new Date();
+                                            let dd = ("0" + (today.getDate())).slice(-2);
+                                            let mm = ("0" + (today.getMonth() + 1)).slice(-2);
+                                            let yyyy = today.getFullYear();
+                                            let todayDate = `${yyyy}-${mm}-${dd}`;
+                                            document.getElementById('dataFimConsulta').value = todayDate;
+
+                                            let firstDayMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+                                            let ddFirst = ("0" + (firstDayMonth.getDate())).slice(-2);
+                                            let mmFirst = ("0" + (firstDayMonth.getMonth() + 1)).slice(-2);
+                                            let yyyyFirst = firstDayMonth.getFullYear();
+                                            let firstDayMonthDate = `${yyyyFirst}-${mmFirst}-${ddFirst}`;
+                                            document.getElementById('dataInicioConsulta').value = firstDayMonthDate;
+                                        } else if (value == 6) {
+                                            let today = new Date();
+                                            let lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+                                            let lastMonthLastDay = new Date(lastMonth.getFullYear(), lastMonth.getMonth() + 1, 0);
+                                            let yyyy = lastMonthLastDay.getFullYear();
+                                            let mm = ("0" + (lastMonthLastDay.getMonth() + 1)).slice(-2);
+                                            let dd = ("0" + lastMonthLastDay.getDate()).slice(-2);
+                                            let lastMonthLastDayStr = `${yyyy}-${mm}-${dd}`;
+                                            document.getElementById('dataFimConsulta').value = lastMonthLastDayStr;
+
+                                            let firstDayMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+                                            let ddFirst = ("0" + (firstDayMonth.getDate())).slice(-2);
+                                            let mmFirst = ("0" + (firstDayMonth.getMonth() + 1)).slice(-2);
+                                            let yyyyFirst = firstDayMonth.getFullYear();
+                                            let firstDayMonthDate = `${yyyyFirst}-${mmFirst}-${ddFirst}`;
+                                            document.getElementById('dataInicioConsulta').value = firstDayMonthDate;
+                                        }
+                                    });
+                                </script>
+
+                                <div class="mb-3">
+                                    <label id="dataInicioLblConsulta" for="dataInicioConsulta" class="form-label"
+                                        hidden>Data de início</label>
+                                    <input type="date" class="form-control" id="dataInicioConsulta" hidden>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="datafim" class="form-label">Data de fim</label>
-                                    <input type="date" class="form-control" id="datafim" placeholder="Data de fim">
+                                    <label id="dataFimLblConsulta" for="dataFimConsulta" class="form-label" hidden>Data
+                                        de fim</label>
+                                    <input type="date" class="form-control" id="dataFimConsulta" hidden>
                                 </div>
+
                                 <div class="mb-3">
-                                    <label for="tipo" class="form-label">Tipo</label>
-                                    <select class="form-select" id="tipo">
+                                    <label for="tipoConsulta" class="form-label">Tipo</label>
+                                    <select class="form-select" id="tipoConsulta">
                                         <option selected disabled></option>
                                         <option value="1">Débito</option>
                                         <option value="2">Crédito</option>
+                                        <option value="3">Todos</option>
                                     </select>
-                                </div>
-                                <button type="submit" class="btn btn-primary">Consultar</button>
+                                </div><br />
+                                <button type="submit" class="btn btn-primary"
+                                    id="consultaRecordsBtm">Consultar</button><br /><br />
+
+                                <h5 id="recordsConsultaTableTitle" hidden></h5>
+                                <table class="table table-sm" id="recordsConsultaTable" hidden>
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Data</th>
+                                            <th>Tipo</th>
+                                            <th>Valor</th>
+                                            <th>Descrição</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recordsConsultaTableBody">
+
+                                    </tbody>
+                                </table><br />
                             </form>
                         </div>
+
+                        <script>
+                            function getRecordsIntervalo() {
+                                let datainicio = document.getElementById('dataInicioConsulta').value;
+                                let datafim = document.getElementById('dataFimConsulta').value;
+                                let tipo = document.getElementById('tipoConsulta').value;
+
+                                // converts date to dd/mm/yyyy
+                                const dataInicioSplit = datainicio.split('-');
+                                const dataInicio = `${dataInicioSplit[2]}/${dataInicioSplit[1]}/${dataInicioSplit[0]}`;
+
+                                const dataFimSplit = datafim.split('-');
+                                const dataFim = `${dataFimSplit[2]}/${dataFimSplit[1]}/${dataFimSplit[0]}`;
+
+                                if (datainicio == '' || datafim == '' || tipo == '') {
+                                    const incConsIntervaloDateModalBodyHtml = `
+                                        <h4>Erro - Campos não preenchidos</h4>
+                                        <p>Não introduziu alguns dados necessários para submeter o formulário.</p>
+                                        <p>Verifique os valores introduzidos e tente novamente.</p>
+                                    `
+                                    const incConsIntervaloDateModalBody = document.getElementById('infConsIntervalo-modal-body');
+                                    incConsIntervaloDateModalBody.innerHTML = incConsIntervaloDateModalBodyHtml;
+                                    $('#infConsIntervalo').modal('show');
+
+                                    return;
+                                }
+
+                                $.ajax({
+                                    url: '/api/consintervalo',
+                                    method: 'POST',
+                                    contentType: 'application/json',
+                                    dataType: 'json',
+                                    data: JSON.stringify({
+                                        dataInicio: dataInicio,
+                                        dataFim: dataFim,
+                                        tipo: tipo
+                                    }),
+                                    success: function (response) {
+                                        if (response['data'].length == 0) {
+                                            document.getElementById('recordsConsultaTable').hidden = true;
+                                            document.getElementById('recordsConsultaTableBody').innerHTML = '';
+                                            document.getElementById('recordsConsultaTableTitle').hidden = false;
+                                            document.getElementById('recordsConsultaTableTitle').innerHTML = `Nenhum registo encontrado para o tipo ${tipo == 1 ? 'Débito' : tipo == 2 ? 'Crédito' : 'Todos'} entre as datas ${dataInicio} e ${dataFim}.`;
+                                            return;
+                                        }
+
+                                        // show table
+                                        document.getElementById('recordsConsultaTableTitle').hidden = false;
+                                        if (response['data'].length == 1) {
+                                            document.getElementById('recordsConsultaTableTitle').innerHTML = `${response['data'].length} registo encontrado para o tipo ${tipo == 1 ? 'Débito' : tipo == 2 ? 'Crédito' : 'Todos'} entre as datas ${dataInicio} e ${dataFim}.`;
+                                        } else {
+                                            document.getElementById('recordsConsultaTableTitle').innerHTML = `${response['data'].length} registos encontrados para o tipo ${tipo == 1 ? 'Débito' : tipo == 2 ? 'Crédito' : 'Todos'} entre as datas ${dataInicio} e ${dataFim}.`;
+                                        }
+                                        document.getElementById('recordsConsultaTable').hidden = false;
+
+                                        // clear table
+                                        document.getElementById('recordsConsultaTableBody').innerHTML = '';
+
+                                        // add rows to table
+                                        for (var i = 0; i < response['data'].length; i++) {
+                                            var row = `<tr>
+                                                <td>${response['data'][i]['id']}</td>
+                                                <td>${response['data'][i]['data']}</td>
+                                                <td>${response['data'][i]['tipo'] == 1 ? 'Débito' : response['data'][i]['tipo'] == 2 ? 'Crédito' : 'Todos'}</td>
+                                                <td>${response['data'][i]['valor']} €</td>
+                                                <td>${response['data'][i]['descricao']}</td>
+                                                `;
+
+                                            row += `</tr>`;
+                                            document.getElementById('recordsConsultaTableBody').innerHTML += row;
+                                        }
+                                    },
+                                    error: function (xhr, status, error) {
+                                        const errAPIFetchConsIntervaloModalBodyHtml = `
+                                            <h4>Erro - Problema ao enviar dados para a API</h4>
+                                            <p>Ocorreu um erro interno ao enviar dados do registo para a API.</p>
+                                            <p>Por favor tente novamente mais tarde. Se o problema persistir, contacte o administrador.</p>
+                                            <p><b>Informação técnica:</b> ${xhr.responseText}</p>
+                                        `
+                                        const errAPIFetchConsIntervaloModalBody = document.getElementById('infConsIntervalo-modal-body');
+                                        errAPIFetchConsIntervaloModalBody.innerHTML = errAPIFetchConsIntervaloModalBodyHtml;
+                                        $('#infConsIntervalo').modal('show');
+                                    }
+                                });
+                            }
+
+                            $('#consultaRecordsBtm').click(function () {
+                                getRecordsIntervalo();
+                            });
+                        </script>
                     </div>
                     <div class="tab-pane fade" id="nav-definicoes" role="tabpanel" aria-labelledby="nav-definicoes-tab">
                         <div class="container col-13 mt-4">

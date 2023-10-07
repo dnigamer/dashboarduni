@@ -243,3 +243,47 @@ async def apagar_api(id: int):
         status_code=200,
         content={"httpCode": 200, "httpState": "OK"},
     )
+
+
+@app.post("/api/consintervalo", response_class=JSONResponse)
+async def consultar_intervalo_api(request: Request):
+    data = await request.json()
+
+    try:
+        if data["tipo"] == "3":
+            cursor.execute(
+                "SELECT * FROM registos WHERE STR_TO_DATE(data, '%d/%m/%Y') BETWEEN STR_TO_DATE(%s, '%d/%m/%Y') AND STR_TO_DATE(%s, '%d/%m/%Y') AND (tipo = 1 OR tipo = 2) ORDER BY STR_TO_DATE(data, '%d/%m/%Y') ASC", 
+                (data["dataInicio"], data["dataFim"], )
+            )
+        else:
+            cursor.execute(
+                "SELECT * FROM registos WHERE STR_TO_DATE(data, '%d/%m/%Y') BETWEEN STR_TO_DATE(%s, '%d/%m/%Y') AND STR_TO_DATE(%s, '%d/%m/%Y') AND tipo = %s ORDER BY STR_TO_DATE(data, '%d/%m/%Y') ASC", 
+                (data["dataInicio"], data["dataFim"], data["tipo"], )
+            )
+        
+        registos = cursor.fetchall()
+
+        jsondata = []
+        for i in range(len(registos)):
+            jsondata.append({
+                    "id": registos[i][0],
+                    "data": str(registos[i][1]),
+                    "valor": str(registos[i][2]),
+                    "tipo": registos[i][3],
+                    "descricao": str(registos[i][4]),
+                })
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "httpCode": 500,
+                "httpState": "Internal Server Error",
+                "errorData": str(e),
+            },
+        )
+
+    return JSONResponse(
+        status_code=200,
+        content={"httpCode": 200, "httpState": "OK", "data": jsondata},
+    )
