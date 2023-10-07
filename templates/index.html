@@ -44,6 +44,28 @@
                                 role="tab" aria-controls="nav-definicoes" aria-selected="false">Definições</a>
                         </li>
                     </ul>
+
+                    <script>
+                        // resets each tab internal content content when unfocused
+                        $('#nav-tab a').on('hide.bs.tab', function (e) {
+                            var target = $(e.target).attr("href");
+                            if (target == "#nav-registar") {
+                                $("#valor").val("");
+                                $("#descricao").val("");
+                                $("#tipo").val("");
+                                $("#datePicker").val("");
+                            } else if (target == "#nav-editar") {
+                                $("#datePickerEdit").val("");
+                                $("#editTableTitle").text("");
+                                $("#editTableTitle").hide();
+                                $("#editTable").hide();
+                            } else if (target == "#nav-consulta") {
+                                $("#datasPredConsulta").val("");
+                                $("#recordsConsultaTableTitle").text("");
+                                $("#recordsConsultaTable").hide();
+                            }
+                        });
+                    </script>
                 </nav>
                 <div class="tab-content" id="nav-tabContent">
                     <div class="tab-pane fade" id="nav-saldo" role="tabpanel" aria-labelledby="nav-saldo-tab">
@@ -53,12 +75,16 @@
 
                             <button type="button" class="btn btn-primary" id="saldoHiderBtn">Mostrar/Esconder
                                 saldo</button>
+                            <button type="button" class="btn btn-primary" id="atualizarSaldoBtn">Atualizar
+                                saldo</button>
+
                             <script>
                                 $(document).ready(function () {
                                     let saldo;
                                     var balState = localStorage.getItem("balanceActive") === "true";
                                     var loaded = false;
                                     var saldohiderbtn = $("#saldoHiderBtn");
+                                    var saldoatualizarbtn = $("#atualizarSaldoBtn");
 
                                     $("#saldoplaceholder").text("A carregar...");
 
@@ -95,6 +121,28 @@
                                             $("#saldoplaceholder").text("-.-- €");
                                         }
                                         localStorage.setItem("balanceActive", balState);
+                                    });
+
+                                    saldoatualizarbtn.click(function () {
+                                        if (!loaded) return;
+                                        $("#saldoplaceholder").text("A atualizar...");
+                                        $.ajax({
+                                            url: '/api/saldo',
+                                            method: 'GET',
+                                            success: function (data) {
+                                                saldo = data.saldo;
+                                                if (balState) {
+                                                    $("#saldoplaceholder").text(saldo + " €");
+                                                } else {
+                                                    $("#saldoplaceholder").text("-.-- €");
+                                                }
+                                            },
+                                            error: function (request, status, error) {
+                                                console.log('Error retrieving saldo from API');
+                                                console.log(request.responseText);
+                                                $("#saldoplaceholder").text("N/D €");
+                                            }
+                                        });
                                     });
                                 });
                             </script>
