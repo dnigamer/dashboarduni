@@ -10,7 +10,11 @@
       crossorigin="anonymous"
     />
     <title>Dashboard Gastos Universidade</title>
+    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- jsPDF -->
+    <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="https://unpkg.com/jspdf-autotable@3.6.0/dist/jspdf.plugin.autotable.js"></script>
     <link rel="stylesheet" href="{{ url_for('static', path='/styles.css') }}" />
   </head>
 
@@ -918,6 +922,7 @@
                     </select>
                   </div>
 
+                  <!-- date selector -->
                   <script>
                     $("#datasPredConsulta").change(function () {
                       const value = document.getElementById("datasPredConsulta").value;
@@ -1014,6 +1019,7 @@
                     });
                   </script>
 
+                  <!-- personalized date -->
                   <div class="mb-3">
                     <label id="dataInicioLblConsulta" for="dataInicioConsulta" class="form-label" hidden>Data de início</label>
                     <input type="date" class="form-control" id="dataInicioConsulta" hidden />
@@ -1035,6 +1041,7 @@
                   <br />
                   <button type="submit" class="btn btn-primary" id="consultaRecordsBtm">Consultar</button><br /><br />
 
+                  <!-- table title and table -->
                   <h5 id="recordsConsultaTableTitle" hidden></h5>
                   <table class="table table-sm" id="recordsConsultaTable" hidden>
                     <thead>
@@ -1048,22 +1055,29 @@
                     </thead>
                     <tbody id="recordsConsultaTableBody"></tbody>
                   </table>
-                  <br />
+
+                  <!-- export as PDF buttons -->
+                  <div class="btn-group" role="group" aria-label="Basic example">
+                    <button type="button" class="btn btn-primary" id="exportPDFBtn" hidden>Exportar como PDF</button>
+                  </div>
                 </form>
               </div>
 
+              <!-- general logic consulta tab -->
               <script>
+                let responseConsulta = [];
+
                 function getRecordsIntervalo() {
                   let datainicio = document.getElementById("dataInicioConsulta").value;
                   let datafim = document.getElementById("dataFimConsulta").value;
                   let tipo = document.getElementById("tipoConsulta").value;
 
                   // converts date to dd/mm/yyyy
-                  const dataInicioSplit = datainicio.split("-");
-                  const dataInicio = `${dataInicioSplit[2]}/${dataInicioSplit[1]}/${dataInicioSplit[0]}`;
+                  let dataInicioSplit = datainicio.split("-");
+                  let dataInicio = `${dataInicioSplit[2]}/${dataInicioSplit[1]}/${dataInicioSplit[0]}`;
 
-                  const dataFimSplit = datafim.split("-");
-                  const dataFim = `${dataFimSplit[2]}/${dataFimSplit[1]}/${dataFimSplit[0]}`;
+                  let dataFimSplit = datafim.split("-");
+                  let dataFim = `${dataFimSplit[2]}/${dataFimSplit[1]}/${dataFimSplit[0]}`;
 
                   if (datainicio == "" || datafim == "" || tipo == "") {
                     const incConsIntervaloDateModalBodyHtml = `
@@ -1131,7 +1145,12 @@
 
                         row += `</tr>`;
                         document.getElementById("recordsConsultaTableBody").innerHTML += row;
+
+                        responseConsulta = response;
                       }
+
+                      // show export as PDF button
+                      document.getElementById("exportPDFBtn").hidden = false;
                     },
                     error: function (xhr, status, error) {
                       const errAPIFetchConsIntervaloModalBodyHtml = `
@@ -1147,8 +1166,96 @@
                   });
                 }
 
+                function exportPDFLogic() {
+                  let datainicio = document.getElementById("dataInicioConsulta").value;
+                  let datafim = document.getElementById("dataFimConsulta").value;
+                  let tipo = document.getElementById("tipoConsulta").value;
+
+                  let dataInicioSplit = datainicio.split("-");
+                  let dataInicio = `${dataInicioSplit[2]}/${dataInicioSplit[1]}/${dataInicioSplit[0]}`;
+                  let dataFimSplit = datafim.split("-");
+                  let dataFim = `${dataFimSplit[2]}/${dataFimSplit[1]}/${dataFimSplit[0]}`;
+
+                  var doc = new jspdf.jsPDF();
+
+                  doc.setFont("helvetica", "normal");
+                  doc.setFontSize(20);
+                  doc.text("Consulta de dados", 15, 20);
+                  doc.setFontSize(10);
+                  doc.text(`Intervalo: de ${dataInicio} a ${dataFim}`, 15, 30);
+                  doc.text(`Tipo: ${tipo == 1 ? "Débito" : tipo == 2 ? "Crédito" : "Todos"}`, 15, 36);
+                  doc.autoTable({ margin: { top: 45 }, html: "#recordsConsultaTable" });
+
+                  // total records text below table
+                  var finalY = doc.autoTable.previous.finalY;
+                  doc.setFontSize(10);
+                  doc.text(`Total de registos: ${responseConsulta["data"].length}`, 15, finalY + 10);
+
+                  // calculate balance
+                  var totalDebito = 0;
+                  var totalCredito = 0;
+                  for (var i = 0; i < responseConsulta["data"].length; i++) {
+                    if (responseConsulta["data"][i]["tipo"] == 1) {
+                      totalDebito += parseFloat(responseConsulta["data"][i]["valor"].replace(",", "."));
+                    } else if (responseConsulta["data"][i]["tipo"] == 2) {
+                      totalCredito += parseFloat(responseConsulta["data"][i]["valor"].replace(",", "."));
+                    }
+                  }
+
+                  // show balance
+                  if (tipo == 1) {
+                    doc.text(`Total de débito: ${totalDebito.toFixed(2)} €`, 15, finalY + 22);
+                  } else if (tipo == 2) {
+                    doc.text(`Total de crédito: ${totalCredito.toFixed(2)} €`, 15, finalY + 22);
+                  } else {
+                    doc.text(`Total de débito: ${totalDebito.toFixed(2)} €`, 15, finalY + 22);
+                    doc.text(`Total de crédito: ${totalCredito.toFixed(2)} €`, 15, finalY + 28);
+                  }
+
+                  // page information footer
+                  var totalPagesExp = doc.internal.getNumberOfPages();
+                  doc.setFontSize(10);
+                  for (var i = totalPagesExp; i >= 1; i--) {
+                    doc.setPage(i);
+                    doc.text(`Página ${i} de ${totalPagesExp}`, 15, doc.internal.pageSize.height - 10);
+                  }
+
+                  // date and hour footer
+                  var today = new Date();
+                  var dd = today.getDate();
+                  var mm = today.getMonth() + 1;
+                  var yyyy = today.getFullYear();
+                  if (dd < 10) {
+                    dd = "0" + dd;
+                  } else if (mm < 10) {
+                    mm = "0" + mm;
+                  }
+                  var todayDate = dd + "/" + mm + "/" + yyyy;
+
+                  var hh = today.getHours();
+                  var min = today.getMinutes();
+                  var sec = today.getSeconds();
+                  if (hh < 10) {
+                    hh = "0" + hh;
+                  } else if (min < 10) {
+                    min = "0" + min;
+                  } else if (sec < 10) {
+                    sec = "0" + sec;
+                  }
+                  var todayHour = hh + ":" + min + ":" + sec;
+                  var message = "Pedido efetuado a " + todayDate + " às " + todayHour;
+
+                  doc.text(message, doc.internal.pageSize.width - 80, doc.internal.pageSize.height - 10);
+
+                  doc.save(`consulta_${todayDate}_${todayHour}.pdf`);
+                }
+
                 $("#consultaRecordsBtm").click(function () {
                   getRecordsIntervalo();
+                });
+
+                $("#exportPDFBtn").click(function () {
+                  exportPDFLogic();
                 });
               </script>
             </div>
