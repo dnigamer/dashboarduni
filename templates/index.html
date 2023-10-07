@@ -1250,8 +1250,19 @@
                   doc.save(`consulta_${todayDate}_${todayHour}.pdf`);
                 }
 
+                var submitted = false;
                 $("#consultaRecordsBtm").click(function () {
-                  getRecordsIntervalo();
+                    submitted = true;
+                    getRecordsIntervalo();
+                });
+
+                $("form :input").change(function () {
+                    if (submitted) {
+                        document.getElementById("recordsConsultaTable").hidden = true;
+                        document.getElementById("recordsConsultaTableBody").innerHTML = "";
+                        document.getElementById("recordsConsultaTableTitle").hidden = true;
+                        document.getElementById("exportPDFBtn").hidden = true;
+                    }
                 });
 
                 $("#exportPDFBtn").click(function () {
