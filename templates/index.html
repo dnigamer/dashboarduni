@@ -1,391 +1,367 @@
 <!DOCTYPE html>
 <html lang="pt">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
-      crossorigin="anonymous"
-    />
-    <title>Dashboard Gastos Universidade</title>
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <!-- jsPDF -->
-    <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-    <script src="https://unpkg.com/jspdf-autotable@3.6.0/dist/jspdf.plugin.autotable.js"></script>
-    <!-- custom css for things -->
-    <link rel="stylesheet" href="{{ url_for('static', path='/styles.css') }}" />
-  </head>
 
-  <body>
-    <div class="container">
-      <div class="row">
-        <div class="col-12 mt-5">
-          <h1>Dashboard Gastos Universidade</h1>
-          <p>Dashboard para guardar todos os gastos com quaisquer produtos ou coisas relacionadas com a universidade.</p>
-        </div>
-        <div class="col-12 mt-4">
-          <!-- navigation tabs -->
-          <nav>
-            <ul class="nav nav-tabs" id="nav-tab" role="tablist">
-              <li class="nav-item">
-                <a
-                  class="nav-link"
-                  id="nav-saldo-tab"
-                  data-bs-toggle="tab"
-                  href="#nav-saldo"
-                  role="tab"
-                  aria-controls="nav-saldo"
-                  aria-selected="true"
-                  >Consultar saldo</a
-                >
-              </li>
-              <li class="nav-item">
-                <a
-                  class="nav-link"
-                  id="nav-registar-tab"
-                  data-bs-toggle="tab"
-                  href="#nav-registar"
-                  role="tab"
-                  aria-controls="nav-registar"
-                  aria-selected="false"
-                  >Registar débito/crédito</a
-                >
-              </li>
-              <li class="nav-item">
-                <a
-                  class="nav-link"
-                  id="nav-editar-tab"
-                  data-bs-toggle="tab"
-                  href="#nav-editar"
-                  role="tab"
-                  aria-controls="nav-editar"
-                  aria-selected="false"
-                  >Editar registo</a
-                >
-              </li>
-              <li class="nav-item">
-                <a
-                  class="nav-link"
-                  id="nav-consulta-tab"
-                  data-bs-toggle="tab"
-                  href="#nav-consulta"
-                  role="tab"
-                  aria-controls="nav-consulta"
-                  aria-selected="false"
-                  >Consultar operações</a
-                >
-              </li>
-              <li class="nav-item">
-                <a
-                  class="nav-link"
-                  id="nav-definicoes-tab"
-                  data-bs-toggle="tab"
-                  href="#nav-definicoes"
-                  role="tab"
-                  aria-controls="nav-definicoes"
-                  aria-selected="false"
-                  >Definições</a
-                >
-              </li>
-            </ul>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+  <title>Dashboard Gastos Universidade</title>
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <!-- jsPDF -->
+  <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://unpkg.com/jspdf-autotable@3.6.0/dist/jspdf.plugin.autotable.js"></script>
+  <!-- custom css for things -->
+  <link rel="stylesheet" href="{{ url_for('static', path='/styles.css') }}" />
+</head>
 
-            <script>
-              // resets each tab internal content content when unfocused
-              $("#nav-tab a").on("hide.bs.tab", function (e) {
-                var target = $(e.target).attr("href");
-                if (target == "#nav-registar") {
-                  $("#valor").val("");
-                  $("#descricao").val("");
-                  $("#tipo").val("");
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="col-12 mt-5">
+        <h1>Dashboard Gastos Universidade</h1>
+      </div>
+      <div class="col-12 mt-4">
+        <!-- navigation tabs -->
+        <nav>
+          <ul class="nav nav-tabs" id="nav-tab" role="tablist">
+            <li class="nav-item">
+              <a class="nav-link" id="nav-saldo-tab" data-bs-toggle="tab" href="#nav-saldo" role="tab"
+                aria-controls="nav-saldo" aria-selected="true">Consultar saldo</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="nav-registar-tab" data-bs-toggle="tab" href="#nav-registar" role="tab"
+                aria-controls="nav-registar" aria-selected="false">Registar débito/crédito</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="nav-editar-tab" data-bs-toggle="tab" href="#nav-editar" role="tab"
+                aria-controls="nav-editar" aria-selected="false">Editar registo</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="nav-consulta-tab" data-bs-toggle="tab" href="#nav-consulta" role="tab"
+                aria-controls="nav-consulta" aria-selected="false">Consultar operações</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="nav-definicoes-tab" data-bs-toggle="tab" href="#nav-definicoes" role="tab"
+                aria-controls="nav-definicoes" aria-selected="false">Definições</a>
+            </li>
+          </ul>
+
+          <script>
+            // resets each tab internal content content when unfocused
+            $("#nav-tab a").on("hide.bs.tab", function (e) {
+              var target = $(e.target).attr("href");
+              if (target == "#nav-registar") {
+                $("#valor").val("");
+                $("#descricao").val("");
+                $("#tipo").val("");
+                var today = new Date();
+                var dd = ("0" + today.getDate()).slice(-2);
+                var mm = ("0" + (today.getMonth() + 1)).slice(-2);
+                var yyyy = today.getFullYear();
+                today = yyyy + "-" + mm + "-" + dd;
+                $("#datePicker").attr("value", today);
+              } else if (target == "#nav-editar") {
+                var today = new Date();
+                var dd = ("0" + today.getDate()).slice(-2);
+                var mm = ("0" + (today.getMonth() + 1)).slice(-2);
+                var yyyy = today.getFullYear();
+                today = yyyy + "-" + mm + "-" + dd;
+                $("#datePickerEdit").attr("value", today);
+                $("#editTableTitle").text("");
+                document.getElementById("editTableTitle").hidden = true;
+                document.getElementById("editTable").hidden = true;
+              } else if (target == "#nav-consulta") {
+                $("#datasPredConsulta").val("");
+                $("#tipoConsulta").val("");
+                document.getElementById("recordsConsultaTable").hidden = true;
+                document.getElementById("recordsConsultaTableBody").value = "";
+                document.getElementById("recordsConsultaTableTitle").hidden = true;
+                document.getElementById("exportPDFBtn").hidden = true;
+              }
+            });
+          </script>
+        </nav>
+
+        <div class="tab-content" id="nav-tabContent">
+          <!-- saldo tab -->
+          <div class="tab-pane fade" id="nav-saldo" role="tabpanel" aria-labelledby="nav-saldo-tab">
+            <div class="container col-13 mt-4">
+              <h5>Saldo ainda disponível:</h5>
+              <h3 id="saldoplaceholder"></h3>
+
+              <!-- buttons for saldo -->
+              <button type="button" class="btn btn-primary" id="saldoHiderBtn">Mostrar/Esconder saldo</button>
+              <button type="button" class="btn btn-primary" id="atualizarSaldoBtn">Atualizar saldo</button>
+              <br /><br />
+
+              <!-- in case of failure in contacting saldo API -->
+              <div class="alert alert-saldo alert-danger alert-dismissible fade show" role="alert" id="alert-saldo"
+                hidden>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                <p><strong>Erro</strong> Problema ao contactar API para obter saldo.</p>
+                <hr>
+                <p class="mb-0">Por favor, tente novamente mais tarde. Verifique a consola para mais informações.</p>
+              </div>
+
+              <script>
+                $(document).ready(function () {
+                  let saldo;
+
+                  var balState = localStorage.getItem("balanceActive") === "true";
+                  var loaded = false;
+                  var saldohiderbtn = $("#saldoHiderBtn");
+                  var saldoatualizarbtn = $("#atualizarSaldoBtn");
+
+                  // temporary message while loading balance
+                  $("#saldoplaceholder").text("A carregar...");
+
+                  // get from API balance and show it on the page
+                  $.ajax({
+                    url: "/api/saldo",
+                    method: "GET",
+                    success: function (data) {
+                      saldo = data.saldo;
+
+                      // check if balance is supposed to be active or not
+                      if (balState) {
+                        $("#saldoplaceholder").text(saldo + " €");
+                        saldohiderbtn.html("Mostrar saldo").addClass("btn-success");
+                      } else {
+                        $("#saldoplaceholder").text("-.-- €");
+                        saldohiderbtn.html("Esconder saldo").addClass("btn-danger");
+                      }
+                      loaded = true;
+                    },
+                    error: function (request, status, error) {
+                      // if error, show error message and disable buttons
+                      console.log("Error retrieving saldo from API");
+                      console.log(request.responseText);
+                      $("#saldoplaceholder").text("N/D €");
+                      saldohiderbtn.html("Erro ao obter saldo").addClass("btn-secondary");
+
+
+                    },
+                  });
+
+                  // if button to hide balance is clicked, change state and save to local storage
+                  saldohiderbtn.click(function () {
+                    if (!loaded) return;
+                    balState = !balState;
+                    if (balState) {
+                      saldohiderbtn.html("Mostrar saldo").removeClass("btn-danger").addClass("btn-success");
+                      $("#saldoplaceholder").text(saldo + " €");
+                    } else {
+                      saldohiderbtn.html("Esconder saldo").removeClass("btn-success").addClass("btn-danger");
+                      $("#saldoplaceholder").text("-.-- €");
+                    }
+                    localStorage.setItem("balanceActive", balState);
+                  });
+
+                  // if button to update balance is clicked, update balance from API
+                  saldoatualizarbtn.click(function () {
+                    if (!loaded) return;
+                    $("#saldoplaceholder").text("A atualizar...");
+                    $.ajax({
+                      url: "/api/saldo",
+                      method: "GET",
+                      success: function (data) {
+                        saldo = data.saldo;
+                        if (balState) {
+                          $("#saldoplaceholder").text(saldo + " €");
+                        } else {
+                          $("#saldoplaceholder").text("-.-- €");
+                        }
+                      },
+                      error: function (request, status, error) {
+                        console.log("Error retrieving saldo from API");
+
+                        var alertList = document.querySelectorAll(".alert-saldo");
+                        alertList.forEach(function (alert) {
+                          new bootstrap.Alert(alert);
+                        });
+                        console.log(request.responseText);
+                        $("#saldoplaceholder").text("N/D €");
+                      },
+                    });
+                  });
+                });
+              </script>
+            </div>
+          </div>
+
+          <!-- registar valores tab -->
+          <div class="tab-pane fade" id="nav-registar" role="tabpanel" aria-labelledby="nav-registar-tab">
+            <div class="container col-13 mt-4">
+              <h5>Registar débito/crédito</h5>
+              <div class="mb-3">
+                <label for="valor" class="form-label">Valor</label>
+                <input type="text" class="form-control" id="valor" placeholder="0.00 €" />
+
+                <script>
+                  // check if valor is numeric and if not show a modal
+                  const input = document.getElementById("valor");
+                  var verifiedInput = false;
+                  input.addEventListener("blur", (event) => {
+                    const value = event.target.value;
+                    if (value) {
+                      const numberValue = parseFloat(value.replace(",", "."));
+                      if (!isNaN(numberValue)) {
+                        const formattedValue = `${numberValue.toFixed(2)} €`.replace(/^0+/, "");
+                        event.target.value = formattedValue;
+                        if (document.getElementById("valor").classList.contains("invalid-input")) {
+                          document.getElementById("valor").classList.remove("invalid-input");
+                        }
+                        verifiedInput = true;
+                      } else {
+                        verifiedInput = false;
+                      }
+                    }
+                  });
+                </script>
+              </div>
+
+              <div class="mb-3">
+                <label for="descricao" class="form-label">Descrição</label>
+                <input type="text" class="form-control" id="descricao" />
+              </div>
+
+              <div class="mb-3">
+                <label for="tipo" class="form-label">Tipo</label>
+                <select class="form-select" id="tipo">
+                  <option selected disabled></option>
+                  <option value="1">Débito</option>
+                  <option value="2">Crédito</option>
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <label for="data" class="form-label">Data</label>
+                <input type="date" class="form-control" id="datePicker" />
+                <script>
+                  // sets date to today's date
                   var today = new Date();
                   var dd = ("0" + today.getDate()).slice(-2);
                   var mm = ("0" + (today.getMonth() + 1)).slice(-2);
                   var yyyy = today.getFullYear();
                   today = yyyy + "-" + mm + "-" + dd;
                   $("#datePicker").attr("value", today);
-                } else if (target == "#nav-editar") {
-                  var today = new Date();
-                  var dd = ("0" + today.getDate()).slice(-2);
-                  var mm = ("0" + (today.getMonth() + 1)).slice(-2);
-                  var yyyy = today.getFullYear();
-                  today = yyyy + "-" + mm + "-" + dd;
-                  $("#datePickerEdit").attr("value", today);
-                  $("#editTableTitle").text("");
-                  document.getElementById("editTableTitle").hidden = true;
-                  document.getElementById("editTable").hidden = true;
-                } else if (target == "#nav-consulta") {
-                  $("#datasPredConsulta").val("");
-                  $("#tipoConsulta").val("");
-                  document.getElementById("recordsConsultaTable").hidden = true;
-                  document.getElementById("recordsConsultaTableBody").value = "";
-                  document.getElementById("recordsConsultaTableTitle").hidden = true;
-                  document.getElementById("exportPDFBtn").hidden = true;
-                }
-              });
-            </script>
-          </nav>
-          <div class="tab-content" id="nav-tabContent">
-            <!-- saldo tab -->
-            <div class="tab-pane fade" id="nav-saldo" role="tabpanel" aria-labelledby="nav-saldo-tab">
-              <div class="container col-13 mt-4">
-                <h5>Saldo ainda disponível:</h5>
-                <h3 id="saldoplaceholder"></h3>
-
-                <!-- buttons for saldo -->
-                <button type="button" class="btn btn-primary" id="saldoHiderBtn">Mostrar/Esconder saldo</button>
-                <button type="button" class="btn btn-primary" id="atualizarSaldoBtn">Atualizar saldo</button>
-
-                <script>
-                  $(document).ready(function () {
-                    let saldo;
-
-                    var balState = localStorage.getItem("balanceActive") === "true";
-                    var loaded = false;
-                    var saldohiderbtn = $("#saldoHiderBtn");
-                    var saldoatualizarbtn = $("#atualizarSaldoBtn");
-
-                    // temporary message while loading balance
-                    $("#saldoplaceholder").text("A carregar...");
-
-                    // get from API balance and show it on the page
-                    $.ajax({
-                      url: "/api/saldo",
-                      method: "GET",
-                      success: function (data) {
-                        saldo = data.saldo;
-
-                        // check if balance is supposed to be active or not
-                        if (balState) {
-                          $("#saldoplaceholder").text(saldo + " €");
-                          saldohiderbtn.html("Mostrar saldo").addClass("btn-success");
-                        } else {
-                          $("#saldoplaceholder").text("-.-- €");
-                          saldohiderbtn.html("Esconder saldo").addClass("btn-danger");
-                        }
-                        loaded = true;
-                      },
-                      error: function (request, status, error) {
-                        // if error, show error message and disable buttons
-                        console.log("Error retrieving saldo from API");
-                        console.log(request.responseText);
-                        $("#saldoplaceholder").text("N/D €");
-                        saldohiderbtn.html("Erro ao obter saldo").addClass("btn-secondary");
-                      },
-                    });
-
-                    // if button to hide balance is clicked, change state and save to local storage
-                    saldohiderbtn.click(function () {
-                      if (!loaded) return;
-                      balState = !balState;
-                      if (balState) {
-                        saldohiderbtn.html("Mostrar saldo").removeClass("btn-danger").addClass("btn-success");
-                        $("#saldoplaceholder").text(saldo + " €");
-                      } else {
-                        saldohiderbtn.html("Esconder saldo").removeClass("btn-success").addClass("btn-danger");
-                        $("#saldoplaceholder").text("-.-- €");
-                      }
-                      localStorage.setItem("balanceActive", balState);
-                    });
-
-                    // if button to update balance is clicked, update balance from API
-                    saldoatualizarbtn.click(function () {
-                      if (!loaded) return;
-                      $("#saldoplaceholder").text("A atualizar...");
-                      $.ajax({
-                        url: "/api/saldo",
-                        method: "GET",
-                        success: function (data) {
-                          saldo = data.saldo;
-                          if (balState) {
-                            $("#saldoplaceholder").text(saldo + " €");
-                          } else {
-                            $("#saldoplaceholder").text("-.-- €");
-                          }
-                        },
-                        error: function (request, status, error) {
-                          console.log("Error retrieving saldo from API");
-                          console.log(request.responseText);
-                          $("#saldoplaceholder").text("N/D €");
-                        },
-                      });
-                    });
-                  });
                 </script>
               </div>
-            </div>
+              <br />
 
-            <!-- registar valores tab -->
-            <div class="tab-pane fade" id="nav-registar" role="tabpanel" aria-labelledby="nav-registar-tab">
-              <div class="container col-13 mt-4">
-                <h5>Registar débito/crédito</h5>
-                <div class="mb-3">
-                  <label for="valor" class="form-label">Valor</label>
-                  <input type="text" class="form-control" id="valor" placeholder="0.00 €" />
+              <script>
+                // if enter is pressed, submit form
+                document.getElementById("datePicker").addEventListener("keyup", function (event) {
+                  if (event.keyCode === 13) {
+                    event.preventDefault();
+                    document.getElementById("submeterRegisto").click();
+                  }
+                });
+              </script>
+              <button type="button" class="btn btn-primary" id="submeterRegisto">Submeter entrada</button>
+              <br /><br />
 
-                  <script>
-                    // check if valor is numeric and if not show a modal
-                    const input = document.getElementById("valor");
-                    var verifiedInput = false;
-                    input.addEventListener("blur", (event) => {
-                      const value = event.target.value;
-                      if (value) {
-                        const numberValue = parseFloat(value.replace(",", "."));
-                        if (!isNaN(numberValue)) {
-                          const formattedValue = `${numberValue.toFixed(2)} €`.replace(/^0+/, "");
-                          event.target.value = formattedValue;
-                          if (document.getElementById("valor").classList.contains("invalid-input")) {
-                            document.getElementById("valor").classList.remove("invalid-input");
-                          }
-                          verifiedInput = true;
-                        } else {
-                          verifiedInput = false;
-                        }
-                      }
-                    });
-                  </script>
-                </div>
-
-                <div class="mb-3">
-                  <label for="descricao" class="form-label">Descrição</label>
-                  <input type="text" class="form-control" id="descricao" />
-                </div>
-
-                <div class="mb-3">
-                  <label for="tipo" class="form-label">Tipo</label>
-                  <select class="form-select" id="tipo">
-                    <option selected disabled></option>
-                    <option value="1">Débito</option>
-                    <option value="2">Crédito</option>
-                  </select>
-                </div>
-
-                <div class="mb-3">
-                  <label for="data" class="form-label">Data</label>
-                  <input type="date" class="form-control" id="datePicker" />
-                  <script>
-                    // sets date to today's date
-                    var today = new Date();
-                    var dd = ("0" + today.getDate()).slice(-2);
-                    var mm = ("0" + (today.getMonth() + 1)).slice(-2);
-                    var yyyy = today.getFullYear();
-                    today = yyyy + "-" + mm + "-" + dd;
-                    $("#datePicker").attr("value", today);
-                  </script>
-                </div>
-                <br />
-
-                <script>
-                  // if enter is pressed, submit form
-                  document.getElementById("datePicker").addEventListener("keyup", function (event) {
-                    if (event.keyCode === 13) {
-                      event.preventDefault();
-                      document.getElementById("submeterRegisto").click();
-                    }
-                  });
-                </script>
-                <button type="button" class="btn btn-primary" id="submeterRegisto">Submeter entrada</button>
-                <br /><br />
-
-                <!-- Summary modal -->
-                <div class="modal fade" id="summary-modal" tabindex="-1" aria-labelledby="summary-modal-label" aria-hidden="true">
-                  <div class="modal-dialog">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h5 class="modal-title" id="summary-modal-label">Registar débito/crédito - Resumo</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                      </div>
-                      <div class="modal-body" id="summary-modal-body"></div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Não</button>
-                        <button type="button" class="btn btn-success" id="summaryApproval" data-bs-dismiss="modal">Sim</button>
-                      </div>
+              <!-- Summary modal -->
+              <div class="modal fade" id="summary-modal" tabindex="-1" aria-labelledby="summary-modal-label"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="summary-modal-label">Registar débito/crédito - Resumo</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="summary-modal-body"></div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Não</button>
+                      <button type="button" class="btn btn-success" id="summaryApproval"
+                        data-bs-dismiss="modal">Sim</button>
                     </div>
                   </div>
                 </div>
+              </div>
 
-                <!-- Information form modal (for general use in errors or success) -->
-                <div id="informationForm" class="modal fade" role="dialog">
-                  <div class="modal-dialog">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <h5 class="modal-title" id="inf-modal-label">Registar débito/crédito - Informação</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                      </div>
-                      <div class="modal-body" id="inf-modal-body"></div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-success" data-bs-dismiss="modal">OK</button>
-                      </div>
+              <!-- Information form modal (for general use in errors or success) -->
+              <div id="informationForm" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title" id="inf-modal-label">Registar débito/crédito - Informação</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body" id="inf-modal-body"></div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-success" data-bs-dismiss="modal">OK</button>
                     </div>
                   </div>
                 </div>
+              </div>
 
-                <script type="text/javascript">
-                  function showSummary() {
-                    let valor = document.getElementById("valor").value;
-                    let descricao = document.getElementById("descricao").value;
-                    let tipo = document.getElementById("tipo").value;
+              <script type="text/javascript">
+                function showSummary() {
+                  let valor = document.getElementById("valor").value;
+                  let descricao = document.getElementById("descricao").value;
+                  let tipo = document.getElementById("tipo").value;
 
-                    let dataBefore = document.getElementById("datePicker").value;
-                    let dataSplit = dataBefore.split("-");
-                    let data = `${dataSplit[2]}/${dataSplit[1]}/${dataSplit[0]}`;
+                  let dataBefore = document.getElementById("datePicker").value;
+                  let dataSplit = dataBefore.split("-");
+                  let data = `${dataSplit[2]}/${dataSplit[1]}/${dataSplit[0]}`;
 
-                    // check if any field is empty and if so show a modal
-                    if (valor == "" || descricao == "" || tipo == "" || data == "") {
-                      const incompleteBody = `
+                  // check if any field is empty and if so show a modal
+                  if (valor == "" || descricao == "" || tipo == "" || data == "") {
+                    const incompleteBody = `
                                                 <h4>Erro - Campos não preenchidos</h4>
                                                 <p>Não introduziu alguns dados necessários para submeter o formulário.</p>
                                                 <p>Verifique os valores introduzidos e tente novamente.</p>
                                             `;
-                      const incompleteModalBody = document.getElementById("inf-modal-body");
-                      incompleteModalBody.innerHTML = incompleteBody;
-                      $("#informationForm").modal("show");
+                    const incompleteModalBody = document.getElementById("inf-modal-body");
+                    incompleteModalBody.innerHTML = incompleteBody;
+                    $("#informationForm").modal("show");
 
-                      return;
-                    }
+                    return;
+                  }
 
-                    // check if valor is numeric and if not show a modal
-                    if (!verifiedInput) {
-                      const invalidBody = `
+                  // check if valor is numeric and if not show a modal
+                  if (!verifiedInput) {
+                    const invalidBody = `
                                                 <h4>Erro - Campos com valores inválidos</h4>
                                                 <p>O campo de <b>valor</b> contém caracteres não numéricos.</p>
                                                 <p>Verifique os valores introduzidos e tente novamente.</p>
                                             `;
-                      const invalidModalBody = document.getElementById("inf-modal-body");
-                      invalidModalBody.innerHTML = invalidBody;
-                      $("#informationForm").modal("show");
+                    const invalidModalBody = document.getElementById("inf-modal-body");
+                    invalidModalBody.innerHTML = invalidBody;
+                    $("#informationForm").modal("show");
 
-                      document.getElementById("valor").value = "";
-                      document.getElementById("valor").focus();
-                      document.getElementById("valor").classList.add("invalid-input");
+                    document.getElementById("valor").value = "";
+                    document.getElementById("valor").focus();
+                    document.getElementById("valor").classList.add("invalid-input");
 
-                      return;
-                    }
+                    return;
+                  }
 
-                    // check if tipo is numeric and if not show a modal
-                    try {
-                      parseFloat(tipo);
-                    } catch (error) {
-                      const invalidBody = `
+                  // check if tipo is numeric and if not show a modal
+                  try {
+                    parseFloat(tipo);
+                  } catch (error) {
+                    const invalidBody = `
                                                 <h4>Erro - Campos com valores inválidos</h4>
                                                 <p>O campo de <b>tipo</b> tem um valor inválido ou não suportado.</p>
                                                 <p>Verifique os valores introduzidos e tente novamente.</p>
                                             `;
-                      const invalidModalBody = document.getElementById("inf-modal-body");
-                      invalidModalBody.innerHTML = invalidBody;
-                      $("#informationForm").modal("show");
+                    const invalidModalBody = document.getElementById("inf-modal-body");
+                    invalidModalBody.innerHTML = invalidBody;
+                    $("#informationForm").modal("show");
 
-                      document.getElementById("tipo").value = "";
-                      document.getElementById("tipo").focus();
-                      document.getElementById("tipo").classList.add("invalid-input");
+                    document.getElementById("tipo").value = "";
+                    document.getElementById("tipo").focus();
+                    document.getElementById("tipo").classList.add("invalid-input");
 
-                      return;
-                    }
+                    return;
+                  }
 
-                    // show summary form for final confirmation
-                    const summary = `
+                  // show summary form for final confirmation
+                  const summary = `
                                             <p><b>Valor:</b> ${valor}</p>
                                             <p><b>Descrição:</b> ${descricao}</p>
                                             <p><b>Tipo:</b> ${tipo === "1" ? "Débito" : "Crédito"}</p>
@@ -394,164 +370,165 @@
                                             <p>Confirma o registo?</p>
                                         `;
 
-                    const summaryModalBody = document.getElementById("summary-modal-body");
-                    summaryModalBody.innerHTML = summary;
-                    $("#summary-modal").modal("show");
-                  }
+                  const summaryModalBody = document.getElementById("summary-modal-body");
+                  summaryModalBody.innerHTML = summary;
+                  $("#summary-modal").modal("show");
+                }
 
-                  function submitForm() {
-                    let valorStr = document.getElementById("valor").value;
-                    let valor = parseFloat(valorStr.replace(" €", "").replace(",", "."));
-                    let descricao = document.getElementById("descricao").value;
-                    let tipo = parseFloat(document.getElementById("tipo").value);
+                function submitForm() {
+                  let valorStr = document.getElementById("valor").value;
+                  let valor = parseFloat(valorStr.replace(" €", "").replace(",", "."));
+                  let descricao = document.getElementById("descricao").value;
+                  let tipo = parseFloat(document.getElementById("tipo").value);
 
-                    let dataBefore = document.getElementById("datePicker").value;
-                    let dataSplit = dataBefore.split("-");
-                    let data = `${dataSplit[2]}/${dataSplit[1]}/${dataSplit[0]}`;
+                  let dataBefore = document.getElementById("datePicker").value;
+                  let dataSplit = dataBefore.split("-");
+                  let data = `${dataSplit[2]}/${dataSplit[1]}/${dataSplit[0]}`;
 
-                    // actually submit form
-                    $.ajax({
-                      url: "/api/registar",
-                      method: "POST",
-                      contentType: "application/json",
-                      dataType: "json",
-                      data: JSON.stringify({
-                        valor: valor,
-                        descricao: descricao,
-                        tipo: tipo,
-                        data: data,
-                      }),
-                      success: function (request, text) {
-                        // if success, reload page showing success modal
-                        localStorage.setItem("postingRecord", "success");
-                        const jsonData = JSON.stringify(request);
-                        localStorage.setItem("postingRecordData", jsonData);
-                        location.reload();
-                      },
-                      error: function (request, status, error) {
-                        // if error, reload page showing error modal
-                        localStorage.setItem("postingRecord", "fail");
-                        localStorage.setItem("postingRecordData", request.responseText);
-                        location.reload();
-                      },
-                    });
-                  }
-
-                  // if summary modal is approved, submit form
-                  $("#summaryApproval").click(function () {
-                    submitForm();
+                  // actually submit form
+                  $.ajax({
+                    url: "/api/registar",
+                    method: "POST",
+                    contentType: "application/json",
+                    dataType: "json",
+                    data: JSON.stringify({
+                      valor: valor,
+                      descricao: descricao,
+                      tipo: tipo,
+                      data: data,
+                    }),
+                    success: function (request, text) {
+                      // if success, reload page showing success modal
+                      localStorage.setItem("postingRecord", "success");
+                      const jsonData = JSON.stringify(request);
+                      localStorage.setItem("postingRecordData", jsonData);
+                      location.reload();
+                    },
+                    error: function (request, status, error) {
+                      // if error, reload page showing error modal
+                      localStorage.setItem("postingRecord", "fail");
+                      localStorage.setItem("postingRecordData", request.responseText);
+                      location.reload();
+                    },
                   });
+                }
 
-                  // if form is submitted, show summary but don't submit
-                  $("#submeterRegisto").click(function () {
-                    showSummary();
-                  });
+                // if summary modal is approved, submit form
+                $("#summaryApproval").click(function () {
+                  submitForm();
+                });
+
+                // if form is submitted, show summary but don't submit
+                $("#submeterRegisto").click(function () {
+                  showSummary();
+                });
+              </script>
+            </div>
+          </div>
+
+          <!-- editar registo tab -->
+          <div class="tab-pane fade" id="nav-editar" role="tabpanel" aria-labelledby="nav-editar-tab">
+            <div class="container col-13 mt-4">
+              <h5>Editar registo</h5>
+              <div class="mb-3">
+                <label for="datePickerEdit" class="form-label">Data</label>
+                <input type="date" class="form-control" id="datePickerEdit" />
+                <script>
+                  // sets date to today's date
+                  var today = new Date();
+                  var dd = ("0" + today.getDate()).slice(-2);
+                  var mm = ("0" + (today.getMonth() + 1)).slice(-2);
+                  var yyyy = today.getFullYear();
+                  today = yyyy + "-" + mm + "-" + dd;
+                  $("#datePickerEdit").attr("value", today);
                 </script>
               </div>
-            </div>
+              <br />
 
-            <!-- editar registo tab -->
-            <div class="tab-pane fade" id="nav-editar" role="tabpanel" aria-labelledby="nav-editar-tab">
-              <div class="container col-13 mt-4">
-                <h5>Editar registo</h5>
-                <div class="mb-3">
-                  <label for="datePickerEdit" class="form-label">Data</label>
-                  <input type="date" class="form-control" id="datePickerEdit" />
-                  <script>
-                    // sets date to today's date
-                    var today = new Date();
-                    var dd = ("0" + today.getDate()).slice(-2);
-                    var mm = ("0" + (today.getMonth() + 1)).slice(-2);
-                    var yyyy = today.getFullYear();
-                    today = yyyy + "-" + mm + "-" + dd;
-                    $("#datePickerEdit").attr("value", today);
-                  </script>
-                </div>
-                <br />
+              <h5 id="editTableTitle" hidden></h5>
+              <table class="table table-sm" id="editTable" hidden>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Valor</th>
+                    <th>Descrição</th>
+                    <th>Tipo</th>
+                    <th>Data</th>
+                    <th></th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="recordsTableBody">
+                  <tr></tr>
+                </tbody>
+              </table>
 
-                <h5 id="editTableTitle" hidden></h5>
-                <table class="table table-sm" id="editTable" hidden>
-                  <thead>
-                    <tr>
-                      <th>ID</th>
-                      <th>Valor</th>
-                      <th>Descrição</th>
-                      <th>Tipo</th>
-                      <th>Data</th>
-                      <th></th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody id="recordsTableBody">
-                    <tr></tr>
-                  </tbody>
-                </table>
+              <button type="submit" class="btn btn-primary" id="dataEditBtn">Procurar registos</button>
+              <br /><br />
 
-                <button type="submit" class="btn btn-primary" id="dataEditBtn">Procurar registos</button>
-                <br /><br />
+              <script>
+                function getRecords(dateParam) {
+                  let dataBefore = document.getElementById("datePickerEdit").value;
+                  let dataSplit = dataBefore.split("-");
+                  let dataEdit = `${dataSplit[2]}/${dataSplit[1]}/${dataSplit[0]}`;
 
-                <script>
-                  function getRecords(dateParam) {
-                    let dataBefore = document.getElementById("datePickerEdit").value;
-                    let dataSplit = dataBefore.split("-");
-                    let dataEdit = `${dataSplit[2]}/${dataSplit[1]}/${dataSplit[0]}`;
+                  if (dateParam != undefined) {
+                    let dataEdit = dateParam;
+                  }
 
-                    if (dateParam != undefined) {
-                      let dataEdit = dateParam;
-                    }
-
-                    // check if data is empty and if so show a modal
-                    if (dataBefore == "") {
-                      const incDateModalBodyHtml = `
+                  // check if data is empty and if so show a modal
+                  if (dataBefore == "") {
+                    const incDateModalBodyHtml = `
                                                 <h4>Erro - Valor de data inválido</h4>
                                                 <p>O valor introduzido para a data é inválido.</p>
                                                 <p>Verifique os valores introduzidos e tente novamente.</p>
                                             `;
-                      const incDateModalBody = document.getElementById("infEditModal-modal-body");
-                      incDateModalBody.innerHTML = incDateModalBodyHtml;
-                      $("#infEditModal").modal("show");
+                    const incDateModalBody = document.getElementById("infEditModal-modal-body");
+                    incDateModalBody.innerHTML = incDateModalBodyHtml;
+                    $("#infEditModal").modal("show");
 
-                      return;
-                    }
+                    return;
+                  }
 
-                    // query API first to check if there are any records for the date
-                    $.ajax({
-                      url: "/api/consulta",
-                      method: "POST",
-                      contentType: "application/json",
-                      dataType: "json",
-                      data: JSON.stringify({
-                        dataConsulta: dataEdit,
-                      }),
-                      success: function (response) {
-                        // if no records, show message in a title below button
-                        if (response["data"].length == 0) {
-                          document.getElementById("editTable").hidden = true;
-                          document.getElementById("recordsTableBody").innerHTML = "";
-                          document.getElementById("editTableTitle").hidden = false;
-                          document.getElementById("editTableTitle").innerHTML = `Nenhum registo encontrado para a data ${dataEdit}.`;
-                          return;
-                        }
-
-                        // show table
-                        document.getElementById("editTableTitle").hidden = false;
-                        if (response["data"].length == 1) {
-                          document.getElementById(
-                            "editTableTitle"
-                          ).innerHTML = `${response["data"].length} registo encontrado para a data ${dataEdit}.`;
-                        } else {
-                          document.getElementById(
-                            "editTableTitle"
-                          ).innerHTML = `${response["data"].length} registos encontrados para a data ${dataEdit}.`;
-                        }
-                        document.getElementById("editTable").hidden = false;
-
-                        // clear table
+                  // query API first to check if there are any records for the date
+                  $.ajax({
+                    url: "/api/consulta",
+                    method: "POST",
+                    contentType: "application/json",
+                    dataType: "json",
+                    data: JSON.stringify({
+                      dataConsulta: dataEdit,
+                    }),
+                    success: function (response) {
+                      // if no records, show message in a title below button
+                      if (response["data"].length == 0) {
+                        document.getElementById("editTable").hidden = true;
                         document.getElementById("recordsTableBody").innerHTML = "";
+                        document.getElementById("editTableTitle").hidden = false;
+                        document.getElementById("editTableTitle").innerHTML =
+                          `Nenhum registo encontrado para a data ${dataEdit}.`;
+                        return;
+                      }
 
-                        // add rows to table
-                        for (var i = 0; i < response["data"].length; i++) {
-                          var row = `<tr>
+                      // show table
+                      document.getElementById("editTableTitle").hidden = false;
+                      if (response["data"].length == 1) {
+                        document.getElementById(
+                          "editTableTitle"
+                        ).innerHTML = `${response["data"].length} registo encontrado para a data ${dataEdit}.`;
+                      } else {
+                        document.getElementById(
+                          "editTableTitle"
+                        ).innerHTML = `${response["data"].length} registos encontrados para a data ${dataEdit}.`;
+                      }
+                      document.getElementById("editTable").hidden = false;
+
+                      // clear table
+                      document.getElementById("recordsTableBody").innerHTML = "";
+
+                      // add rows to table
+                      for (var i = 0; i < response["data"].length; i++) {
+                        var row = `<tr>
                                         <td>${response["data"][i]["id"]}</td>
                                         <td>${response["data"][i]["valor"]} €</td>
                                         <td>${response["data"][i]["descricao"]}</td>
@@ -580,792 +557,810 @@
                                             </button></td>
                                         `;
 
-                          row += `</tr>`;
-                          document.getElementById("recordsTableBody").innerHTML += row;
-                        }
-                      },
-                      error: function (xhr, status, error) {
-                        // if error, show error message in a title below button
-                        document.getElementById("editTable").hidden = true;
-                        document.getElementById("recordsTableBody").innerHTML = "";
-                        document.getElementById("editTableTitle").hidden = false;
-                        document.getElementById("editTableTitle").innerHTML = `Erro ao obter registos para a data ${dataEdit}.`;
+                        row += `</tr>`;
+                        document.getElementById("recordsTableBody").innerHTML += row;
+                      }
+                    },
+                    error: function (xhr, status, error) {
+                      // if error, show error message in a title below button
+                      document.getElementById("editTable").hidden = true;
+                      document.getElementById("recordsTableBody").innerHTML = "";
+                      document.getElementById("editTableTitle").hidden = false;
+                      document.getElementById("editTableTitle").innerHTML =
+                        `Erro ao obter registos para a data ${dataEdit}.`;
 
-                        console.log("Error retrieving records from API");
-                        console.log(xhr.responseText);
-                      },
-                    });
-                  }
+                      console.log("Error retrieving records from API");
+                      console.log(xhr.responseText);
+                    },
+                  });
+                }
 
-                  function editRecord(id) {
-                    console.log("Editing record with ID " + id);
+                function editRecord(id) {
+                  console.log("Editing record with ID " + id);
 
-                    $.ajax({
-                      url: `/api/consulta/${id}`,
-                      method: "POST",
-                      contentType: "application/json",
-                      dataType: "json",
-                      success: function (response) {
-                        let finish = false;
+                  $.ajax({
+                    url: `/api/consulta/${id}`,
+                    method: "POST",
+                    contentType: "application/json",
+                    dataType: "json",
+                    success: function (response) {
+                      let finish = false;
 
-                        const valorBefore = response["data"][0]["valor"];
-                        const numberParsBefore = parseFloat(valorBefore.replace(",", "."));
+                      const valorBefore = response["data"][0]["valor"];
+                      const numberParsBefore = parseFloat(valorBefore.replace(",", "."));
 
-                        const descricaoBefore = response["data"][0]["descricao"];
-                        const tipoBefore = response["data"][0]["tipo"];
+                      const descricaoBefore = response["data"][0]["descricao"];
+                      const tipoBefore = response["data"][0]["tipo"];
 
-                        const dataBefore = response["data"][0]["data"];
-                        const dataBeforeSplit = dataBefore.split("/");
-                        const dataParsEdit = `${dataBeforeSplit[2]}-${dataBeforeSplit[1]}-${dataBeforeSplit[0]}`;
+                      const dataBefore = response["data"][0]["data"];
+                      const dataBeforeSplit = dataBefore.split("/");
+                      const dataParsEdit = `${dataBeforeSplit[2]}-${dataBeforeSplit[1]}-${dataBeforeSplit[0]}`;
 
-                        $("#trueEditModal-body-idEdit").val(id);
-                        $("#trueEditModal-body-valorEdit").val(`${numberParsBefore.toFixed(2)} €`.replace(/^0+/, ""));
-                        $("#trueEditModal-body-descricaoEdit").val(descricaoBefore);
-                        $("#trueEditModal-body-tipoEdit").val(tipoBefore);
-                        $("#trueEditModal-body-dataEdit").val(dataParsEdit);
+                      $("#trueEditModal-body-idEdit").val(id);
+                      $("#trueEditModal-body-valorEdit").val(`${numberParsBefore.toFixed(2)} €`.replace(/^0+/,
+                        ""));
+                      $("#trueEditModal-body-descricaoEdit").val(descricaoBefore);
+                      $("#trueEditModal-body-tipoEdit").val(tipoBefore);
+                      $("#trueEditModal-body-dataEdit").val(dataParsEdit);
 
-                        $("#trueEditModal").modal("show");
+                      $("#trueEditModal").modal("show");
 
-                        $("#trueEditModal-body-submitEdit").click(function () {
-                          // gets values from form
-                          const idEdit = document.getElementById("trueEditModal-body-idEdit").value;
-                          const valorEditBefore = document.getElementById("trueEditModal-body-valorEdit").value;
-                          const descricaoEdit = document.getElementById("trueEditModal-body-descricaoEdit").value;
-                          const tipoEdit = document.getElementById("trueEditModal-body-tipoEdit").value;
+                      $("#trueEditModal-body-submitEdit").click(function () {
+                        // gets values from form
+                        const idEdit = document.getElementById("trueEditModal-body-idEdit").value;
+                        const valorEditBefore = document.getElementById("trueEditModal-body-valorEdit").value;
+                        const descricaoEdit = document.getElementById("trueEditModal-body-descricaoEdit")
+                          .value;
+                        const tipoEdit = document.getElementById("trueEditModal-body-tipoEdit").value;
 
-                          var dataBefore = document.getElementById("trueEditModal-body-dataEdit").value;
-                          const dataSplit = dataBefore.split("-");
-                          const dataEdit = `${dataSplit[2]}/${dataSplit[1]}/${dataSplit[0]}`;
+                        var dataBefore = document.getElementById("trueEditModal-body-dataEdit").value;
+                        const dataSplit = dataBefore.split("-");
+                        const dataEdit = `${dataSplit[2]}/${dataSplit[1]}/${dataSplit[0]}`;
 
-                          $("#infEditModal-body-OKBtn").click(function () {
-                            if (finish != true) $("#trueEditModal").modal("show");
-                          });
+                        $("#infEditModal-body-OKBtn").click(function () {
+                          if (finish != true) $("#trueEditModal").modal("show");
+                        });
 
-                          // verifies existence of all inputs
-                          if (valorEditBefore == "" || descricaoEdit == "" || tipoEdit == "" || dataEdit == "") {
-                            const incompleteBody = `
+                        // verifies existence of all inputs
+                        if (valorEditBefore == "" || descricaoEdit == "" || tipoEdit == "" || dataEdit ==
+                          "") {
+                          const incompleteBody = `
                                                             <h4>Erro - Campos não preenchidos</h4>
                                                             <p>Não introduziu alguns dados necessários para submeter o formulário.</p>
                                                             <p>Verifique os valores introduzidos e tente novamente.</p>
                                                         `;
-                            const incompleteModalBody = document.getElementById("infEditModal-modal-body");
-                            incompleteModalBody.innerHTML = incompleteBody;
-                            $("#infEditModal").modal("show");
+                          const incompleteModalBody = document.getElementById("infEditModal-modal-body");
+                          incompleteModalBody.innerHTML = incompleteBody;
+                          $("#infEditModal").modal("show");
 
-                            return;
-                          }
+                          return;
+                        }
 
-                          // verifies value input
-                          const valorEditAfter = valorEditBefore.replace(" €", "").replace(",", ".");
-                          if (!isNaN(valorEditAfter)) {
-                            verifiedInput = true;
-                          } else {
-                            verifiedInput = false;
-                          }
+                        // verifies value input
+                        const valorEditAfter = valorEditBefore.replace(" €", "").replace(",", ".");
+                        if (!isNaN(valorEditAfter)) {
+                          verifiedInput = true;
+                        } else {
+                          verifiedInput = false;
+                        }
 
-                          // check if valor is numeric and if not show a modal
-                          if (!verifiedInput) {
-                            const invalidEditBody = `
+                        // check if valor is numeric and if not show a modal
+                        if (!verifiedInput) {
+                          const invalidEditBody = `
                                                             <h4>Erro - Campos com valores inválidos</h4>
                                                             <p>O campo de <b>valor</b> contém caracteres não numéricos.</p>
                                                             <p>Verifique os valores introduzidos e tente novamente.</p>
                                                         `;
-                            const invalidEditModalBody = document.getElementById("infEditModal-modal-body");
-                            invalidEditModalBody.innerHTML = invalidEditBody;
-                            $("#infEditModal").modal("show");
+                          const invalidEditModalBody = document.getElementById("infEditModal-modal-body");
+                          invalidEditModalBody.innerHTML = invalidEditBody;
+                          $("#infEditModal").modal("show");
 
-                            document.getElementById("trueEditModal-body-valorEdit").value = `${numberParsBefore.toFixed(2)} €`.replace(/^0+/, "");
-                            document.getElementById("trueEditModal-body-valorEdit").classList.add("invalid-input");
+                          document.getElementById("trueEditModal-body-valorEdit").value =
+                            `${numberParsBefore.toFixed(2)} €`.replace(/^0+/, "");
+                          document.getElementById("trueEditModal-body-valorEdit").classList.add(
+                            "invalid-input");
 
-                            return;
-                          }
+                          return;
+                        }
 
-                          // verifies if tipo is numeric (either 1 or 2 not verified)
-                          try {
-                            parseFloat(tipoEdit);
-                          } catch (error) {
-                            const invalidEditBody = `
+                        // verifies if tipo is numeric (either 1 or 2 not verified)
+                        try {
+                          parseFloat(tipoEdit);
+                        } catch (error) {
+                          const invalidEditBody = `
                                                             <h4>Erro - Campos com valores inválidos</h4>
                                                             <p>O campo de <b>tipo</b> tem um valor inválido ou não suportado.</p>
                                                             <p>Verifique os valores introduzidos e tente novamente.</p>
                                                         `;
-                            const invalidEditModalBody = document.getElementById("infEditModal-modal-body");
-                            invalidEditModalBody.innerHTML = invalidEditBody;
-                            $("#infEditModal").modal("show");
+                          const invalidEditModalBody = document.getElementById("infEditModal-modal-body");
+                          invalidEditModalBody.innerHTML = invalidEditBody;
+                          $("#infEditModal").modal("show");
 
-                            return;
-                          }
+                          return;
+                        }
 
-                          // PUT request to API to edit record
-                          $.ajax({
-                            url: `/api/editar/${idEdit}`,
-                            method: "PUT",
-                            contentType: "application/json",
-                            dataType: "json",
-                            data: JSON.stringify({
-                              valor: valorEditAfter,
-                              descricao: descricaoEdit,
-                              tipo: tipoEdit,
-                              data: dataEdit,
-                            }),
-                            success: function (response) {
-                              const successBody = `
+                        // PUT request to API to edit record
+                        $.ajax({
+                          url: `/api/editar/${idEdit}`,
+                          method: "PUT",
+                          contentType: "application/json",
+                          dataType: "json",
+                          data: JSON.stringify({
+                            valor: valorEditAfter,
+                            descricao: descricaoEdit,
+                            tipo: tipoEdit,
+                            data: dataEdit,
+                          }),
+                          success: function (response) {
+                            const successBody = `
                                                                 <h4>Registo editado com sucesso</h4>
                                                                 <p>O registo foi editado com sucesso.</p>
                                                                 <p>Por favor clique em OK para atualizar a tabela.</p>
                                                             `;
-                              const successModalBody = document.getElementById("infEditModal-modal-body");
-                              successModalBody.innerHTML = successBody;
+                            const successModalBody = document.getElementById("infEditModal-modal-body");
+                            successModalBody.innerHTML = successBody;
 
-                              $("#infEditModal").modal("show");
+                            $("#infEditModal").modal("show");
 
-                              finish = true;
+                            finish = true;
 
-                              $("#infEditModal-body-OKBtn").click(function () {
-                                localStorage.setItem("editRecordNext", "getRecords");
-                                localStorage.setItem("editRecordNextDate", dataEdit);
-                                location.reload();
-                              });
-                            },
-                            error: function (xhr, status, error) {
-                              const errAPIFetchEditModalBodyHtml = `
+                            $("#infEditModal-body-OKBtn").click(function () {
+                              localStorage.setItem("editRecordNext", "getRecords");
+                              localStorage.setItem("editRecordNextDate", dataEdit);
+                              location.reload();
+                            });
+                          },
+                          error: function (xhr, status, error) {
+                            const errAPIFetchEditModalBodyHtml = `
                                                                 <h4>Erro - Problema ao enviar dados para a API</h4>
                                                                 <p>Ocorreu um erro interno ao enviar dados do registo editado para a API.</p>
                                                                 <p>Por favor tente novamente mais tarde. Se o problema persistir, contacte o administrador.</p>
                                                                 <p><b>Informação técnica:</b> ${xhr.responseText}</p>
                                                             `;
-                              const errAPIFetchEditModalBody = document.getElementById("infEditModal-modal-body");
-                              errAPIFetchEditModalBody.innerHTML = errAPIFetchEditModalBodyHtml;
-                              $("#infEditModal").modal("show");
-                            },
-                          });
+                            const errAPIFetchEditModalBody = document.getElementById(
+                              "infEditModal-modal-body");
+                            errAPIFetchEditModalBody.innerHTML = errAPIFetchEditModalBodyHtml;
+                            $("#infEditModal").modal("show");
+                          },
                         });
-                      },
-                      error: function (xhr, status, error) {
-                        const errAPIFetchEditModalBodyHtml = `
+                      });
+                    },
+                    error: function (xhr, status, error) {
+                      const errAPIFetchEditModalBodyHtml = `
                                                     <h4>Erro - Problema ao obter dados da API</h4>
                                                     <p>Ocorreu um erro interno ao obter dados do registo da API.</p>
                                                     <p>Por favor tente novamente mais tarde. Se o problema persistir, contacte o administrador.</p>
                                                     <p><b>Informação técnica:</b> ${xhr.responseText}</p>
                                                 `;
-                        const errAPIFetchEditModalBody = document.getElementById("infEditModal-modal-body");
-                        errAPIFetchEditModalBody.innerHTML = errAPIFetchEditModalBodyHtml;
-                        $("#infEditModal").modal("show");
-                      },
-                    });
-                  }
+                      const errAPIFetchEditModalBody = document.getElementById("infEditModal-modal-body");
+                      errAPIFetchEditModalBody.innerHTML = errAPIFetchEditModalBodyHtml;
+                      $("#infEditModal").modal("show");
+                    },
+                  });
+                }
 
-                  function deleteRecord(id) {
-                    console.log("Deleting record with ID " + id);
+                function deleteRecord(id) {
+                  console.log("Deleting record with ID " + id);
 
-                    const confirmBody = `
+                  const confirmBody = `
                                             <p>Tem a certeza que pretende apagar o registo com o ID <b>${id}</b>?</p>
                                         `;
-                    const confirmModalBody = document.getElementById("confirmEditModal-modal-body");
-                    confirmModalBody.innerHTML = confirmBody;
-                    $("#confirmEditModal").modal("show");
+                  const confirmModalBody = document.getElementById("confirmEditModal-modal-body");
+                  confirmModalBody.innerHTML = confirmBody;
+                  $("#confirmEditModal").modal("show");
 
-                    $("#confirmEditModal-body-YesBtn").click(function () {
-                      $.ajax({
-                        url: `/api/apagar/${id}`,
-                        method: "DELETE",
-                        contentType: "application/json",
-                        dataType: "json",
-                        success: function (response) {
-                          const successBody = `
+                  $("#confirmEditModal-body-YesBtn").click(function () {
+                    $.ajax({
+                      url: `/api/apagar/${id}`,
+                      method: "DELETE",
+                      contentType: "application/json",
+                      dataType: "json",
+                      success: function (response) {
+                        const successBody = `
                                                         <h4>Registo ID: <b>${id}</b> apagado com sucesso</h4>
                                                         <p>O registo foi apagado com sucesso.</p>
                                                         <p>Por favor clique em OK para atualizar a tabela.</p>
                                                     `;
-                          const successModalBody = document.getElementById("infEditModal-modal-body");
-                          successModalBody.innerHTML = successBody;
-                          $("#infEditModal").modal("show");
+                        const successModalBody = document.getElementById("infEditModal-modal-body");
+                        successModalBody.innerHTML = successBody;
+                        $("#infEditModal").modal("show");
 
-                          $("#infEditModal-body-OKBtn").click(function () {
-                            location.reload();
-                          });
-                        },
-                        error: function (xhr, status, error) {
-                          const errAPIFetchEditModalBodyHtml = `
+                        $("#infEditModal-body-OKBtn").click(function () {
+                          location.reload();
+                        });
+                      },
+                      error: function (xhr, status, error) {
+                        const errAPIFetchEditModalBodyHtml = `
                                                         <h4>Erro - Problema ao enviar dados para a API</h4>
                                                         <p>Ocorreu um erro interno ao enviar dados do registo apagado para a API.</p>
                                                         <p>Por favor tente novamente mais tarde.<br/> Se o problema persistir, contacte o administrador.</p>
                                                         <p><b>Informação técnica:</b> ${xhr.responseText}</p>
                                                     `;
-                          const errAPIFetchEditModalBody = document.getElementById("infEditModal-modal-body");
-                          errAPIFetchEditModalBody.innerHTML = errAPIFetchEditModalBodyHtml;
-                          $("#infEditModal").modal("show");
-                        },
-                      });
+                        const errAPIFetchEditModalBody = document.getElementById("infEditModal-modal-body");
+                        errAPIFetchEditModalBody.innerHTML = errAPIFetchEditModalBodyHtml;
+                        $("#infEditModal").modal("show");
+                      },
                     });
-                  }
-
-                  $("#dataEditBtn").click(function () {
-                    getRecords();
                   });
-                </script>
-              </div>
+                }
 
-              <!-- Information form modal (for general use in errors or success) -->
-              <div id="infEditModal" class="modal fade" role="dialog">
-                <div class="modal-dialog">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h5 class="modal-title" id="infEditModal-modal-label">Informação - Editar registo</h5>
-                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body" id="infEditModal-modal-body"></div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-success" data-bs-dismiss="modal" id="infEditModal-body-OKBtn">OK</button>
-                    </div>
+                $("#dataEditBtn").click(function () {
+                  getRecords();
+                });
+              </script>
+            </div>
+
+            <!-- Information form modal (for general use in errors or success) -->
+            <div id="infEditModal" class="modal fade" role="dialog">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="infEditModal-modal-label">Informação - Editar registo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
-                </div>
-              </div>
-
-              <!-- Confirmation modal -->
-              <div id="confirmEditModal" class="modal fade" role="dialog">
-                <div class="modal-dialog">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h5 class="modal-title" id="confirmEditModal-modal-title">Apagar registo - Confirmação</h5>
-                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body" id="confirmEditModal-modal-body"></div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Não</button>
-                      <button type="button" class="btn btn-success" id="confirmEditModal-body-YesBtn" data-bs-dismiss="modal">Sim</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Edit form modal (for general use in errors or success) -->
-              <div id="trueEditModal" class="modal fade" role="dialog">
-                <div class="modal-dialog">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h5 class="modal-title" id="trueEditModal-modal-title">Informação - Editar registo</h5>
-                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body" id="trueEditModal-modal-body">
-                      <form>
-                        <div class="mb-3">
-                          <label for="trueEditModal-body-idEdit" class="form-label">ID</label>
-                          <input type="text" class="form-control" id="trueEditModal-body-idEdit" disabled />
-                        </div>
-
-                        <div class="mb-3">
-                          <label for="trueEditModal-body-valorEdit" class="form-label">Valor</label>
-                          <input type="text" class="form-control" id="trueEditModal-body-valorEdit" placeholder="0.00 €" />
-
-                          <script>
-                            const inputEdit = document.getElementById("trueEditModal-body-valorEdit");
-                            var verifiedInput = false;
-
-                            inputEdit.addEventListener("blur", (event) => {
-                              const value = event.target.value;
-
-                              if (value) {
-                                const numberValue = parseFloat(value.replace(",", "."));
-                                if (!isNaN(numberValue)) {
-                                  const formattedValue = `${numberValue.toFixed(2)} €`.replace(/^0+/, "");
-                                  event.target.value = formattedValue;
-                                  if (document.getElementById("trueEditModal-body-valorEdit").classList.contains("invalid-input")) {
-                                    document.getElementById("trueEditModal-body-valorEdit").classList.remove("invalid-input");
-                                  }
-                                  verifiedInput = true;
-                                } else {
-                                  verifiedInput = false;
-                                }
-                              }
-                            });
-                          </script>
-                        </div>
-
-                        <div class="mb-3">
-                          <label for="trueEditModal-body-descricaoEdit" class="form-label">Descrição</label>
-                          <input type="text" class="form-control" id="trueEditModal-body-descricaoEdit" />
-                        </div>
-
-                        <div class="mb-3">
-                          <label for="trueEditModal-body-tipoEdit" class="form-label">Tipo</label>
-                          <select class="form-select" id="trueEditModal-body-tipoEdit">
-                            <option selected disabled></option>
-                            <option value="1">Débito</option>
-                            <option value="2">Crédito</option>
-                          </select>
-                        </div>
-
-                        <div class="mb-3">
-                          <label for="trueEditModal-body-dataEdit" class="form-label">Data</label>
-                          <input type="date" class="form-control" id="trueEditModal-body-dataEdit" />
-                        </div>
-
-                        <script>
-                          // if enter is pressed, submit form
-                          document.getElementById("trueEditModal-body-dataEdit").addEventListener("keyup", function (event) {
-                            if (event.keyCode === 13) {
-                              event.preventDefault();
-                              document.getElementById("trueEditModal-body-submitEdit").click();
-                            }
-                          });
-                        </script>
-                      </form>
-                    </div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                      <button type="button" class="btn btn-success" data-bs-dismiss="modal" id="trueEditModal-body-submitEdit">OK</button>
-                    </div>
+                  <div class="modal-body" id="infEditModal-modal-body"></div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-bs-dismiss="modal"
+                      id="infEditModal-body-OKBtn">OK</button>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- consultar operações tab -->
-            <div class="tab-pane fade" id="nav-consulta" role="tabpanel" aria-labelledby="nav-consulta-tab">
-              <!-- Information form modal (for general use in errors or success) -->
-              <div id="infConsIntervalo" class="modal fade" role="dialog">
-                <div class="modal-dialog">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h5 class="modal-title" id="infConsIntervalo-modal-label">Informação - Consultar operações</h5>
-                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body" id="infConsIntervalo-modal-body"></div>
-                    <div class="modal-footer">
-                      <button type="button" class="btn btn-success" data-bs-dismiss="modal" id="infConsIntervalo-body-OKBtn">OK</button>
-                    </div>
+            <!-- Confirmation modal -->
+            <div id="confirmEditModal" class="modal fade" role="dialog">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="confirmEditModal-modal-title">Apagar registo - Confirmação</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body" id="confirmEditModal-modal-body"></div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Não</button>
+                    <button type="button" class="btn btn-success" id="confirmEditModal-body-YesBtn"
+                      data-bs-dismiss="modal">Sim</button>
                   </div>
                 </div>
               </div>
+            </div>
 
-              <div class="container col-13 mt-4">
-                <h5>Consultar operações</h5>
-                <div class="mb-3">
-                  <label for="datasPredConsulta" class="form-label">Data</label>
-                  <select class="form-select" id="datasPredConsulta">
-                    <option selected disabled></option>
-                    <option value="1">Hoje</option>
-                    <option value="2">Ontem</option>
-                    <option value="3">Últimos 7 dias</option>
-                    <option value="4">Últimos 30 dias</option>
-                    <option value="5">Este mês</option>
-                    <option value="6">Mês anterior</option>
-                    <option value="7">Personalizado</option>
-                  </select>
+            <!-- Edit form modal (for general use in errors or success) -->
+            <div id="trueEditModal" class="modal fade" role="dialog">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="trueEditModal-modal-title">Informação - Editar registo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body" id="trueEditModal-modal-body">
+                    <form>
+                      <div class="mb-3">
+                        <label for="trueEditModal-body-idEdit" class="form-label">ID</label>
+                        <input type="text" class="form-control" id="trueEditModal-body-idEdit" disabled />
+                      </div>
+
+                      <div class="mb-3">
+                        <label for="trueEditModal-body-valorEdit" class="form-label">Valor</label>
+                        <input type="text" class="form-control" id="trueEditModal-body-valorEdit"
+                          placeholder="0.00 €" />
+
+                        <script>
+                          const inputEdit = document.getElementById("trueEditModal-body-valorEdit");
+                          var verifiedInput = false;
+
+                          inputEdit.addEventListener("blur", (event) => {
+                            const value = event.target.value;
+
+                            if (value) {
+                              const numberValue = parseFloat(value.replace(",", "."));
+                              if (!isNaN(numberValue)) {
+                                const formattedValue = `${numberValue.toFixed(2)} €`.replace(/^0+/, "");
+                                event.target.value = formattedValue;
+                                if (document.getElementById("trueEditModal-body-valorEdit").classList.contains(
+                                    "invalid-input")) {
+                                  document.getElementById("trueEditModal-body-valorEdit").classList.remove(
+                                    "invalid-input");
+                                }
+                                verifiedInput = true;
+                              } else {
+                                verifiedInput = false;
+                              }
+                            }
+                          });
+                        </script>
+                      </div>
+
+                      <div class="mb-3">
+                        <label for="trueEditModal-body-descricaoEdit" class="form-label">Descrição</label>
+                        <input type="text" class="form-control" id="trueEditModal-body-descricaoEdit" />
+                      </div>
+
+                      <div class="mb-3">
+                        <label for="trueEditModal-body-tipoEdit" class="form-label">Tipo</label>
+                        <select class="form-select" id="trueEditModal-body-tipoEdit">
+                          <option selected disabled></option>
+                          <option value="1">Débito</option>
+                          <option value="2">Crédito</option>
+                        </select>
+                      </div>
+
+                      <div class="mb-3">
+                        <label for="trueEditModal-body-dataEdit" class="form-label">Data</label>
+                        <input type="date" class="form-control" id="trueEditModal-body-dataEdit" />
+                      </div>
+
+                      <script>
+                        // if enter is pressed, submit form
+                        document.getElementById("trueEditModal-body-dataEdit").addEventListener("keyup", function (
+                          event) {
+                          if (event.keyCode === 13) {
+                            event.preventDefault();
+                            document.getElementById("trueEditModal-body-submitEdit").click();
+                          }
+                        });
+                      </script>
+                    </form>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success" data-bs-dismiss="modal"
+                      id="trueEditModal-body-submitEdit">OK</button>
+                  </div>
                 </div>
+              </div>
+            </div>
+          </div>
 
-                <!-- date selector -->
-                <script>
-                  $("#datasPredConsulta").change(function () {
-                    const value = document.getElementById("datasPredConsulta").value;
-
-                    if (value == 7) {
-                      document.getElementById("dataInicioLblConsulta").hidden = false;
-                      document.getElementById("dataFimLblConsulta").hidden = false;
-                      document.getElementById("dataInicioConsulta").hidden = false;
-                      document.getElementById("dataFimConsulta").hidden = false;
-                    } else {
-                      document.getElementById("dataInicioLblConsulta").hidden = true;
-                      document.getElementById("dataFimLblConsulta").hidden = true;
-                      document.getElementById("dataInicioConsulta").hidden = true;
-                      document.getElementById("dataFimConsulta").hidden = true;
-                    }
-
-                    if (value == 1) {
-                      let today = new Date();
-                      let dd = ("0" + today.getDate()).slice(-2);
-                      let mm = ("0" + (today.getMonth() + 1)).slice(-2);
-                      let yyyy = today.getFullYear();
-                      let todayDate = `${yyyy}-${mm}-${dd}`;
-                      document.getElementById("dataInicioConsulta").value = todayDate;
-                      document.getElementById("dataFimConsulta").value = todayDate;
-                    } else if (value == 2) {
-                      let today = new Date();
-                      let dd = ("0" + (today.getDate() - 1)).slice(-2);
-                      let mm = ("0" + (today.getMonth() + 1)).slice(-2);
-                      let yyyy = today.getFullYear();
-                      let todayDate = `${yyyy}-${mm}-${dd}`;
-                      document.getElementById("dataInicioConsulta").value = todayDate;
-                      document.getElementById("dataFimConsulta").value = todayDate;
-                    } else if (value == 3) {
-                      let today = new Date();
-                      let dd = ("0" + today.getDate()).slice(-2);
-                      let mm = ("0" + (today.getMonth() + 1)).slice(-2);
-                      let yyyy = today.getFullYear();
-                      let todayDate = `${yyyy}-${mm}-${dd}`;
-                      document.getElementById("dataFimConsulta").value = todayDate;
-
-                      let sevenDaysAgo = new Date();
-                      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-                      let dd7 = ("0" + sevenDaysAgo.getDate()).slice(-2);
-                      let mm7 = ("0" + (sevenDaysAgo.getMonth() + 1)).slice(-2);
-                      let yyyy7 = sevenDaysAgo.getFullYear();
-                      let sevenDaysAgoDate = `${yyyy7}-${mm7}-${dd7}`;
-                      document.getElementById("dataInicioConsulta").value = sevenDaysAgoDate;
-                    } else if (value == 4) {
-                      let today = new Date();
-                      let dd = ("0" + today.getDate()).slice(-2);
-                      let mm = ("0" + (today.getMonth() + 1)).slice(-2);
-                      let yyyy = today.getFullYear();
-                      let todayDate = `${yyyy}-${mm}-${dd}`;
-                      document.getElementById("dataFimConsulta").value = todayDate;
-
-                      let thirtyDaysAgo = new Date();
-                      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-                      let dd30 = ("0" + thirtyDaysAgo.getDate()).slice(-2);
-                      let mm30 = ("0" + (thirtyDaysAgo.getMonth() + 1)).slice(-2);
-                      let yyyy30 = thirtyDaysAgo.getFullYear();
-                      let thirtyDaysAgoDate = `${yyyy30}-${mm30}-${dd30}`;
-                      document.getElementById("dataInicioConsulta").value = thirtyDaysAgoDate;
-                    } else if (value == 5) {
-                      let today = new Date();
-                      let dd = ("0" + today.getDate()).slice(-2);
-                      let mm = ("0" + (today.getMonth() + 1)).slice(-2);
-                      let yyyy = today.getFullYear();
-                      let todayDate = `${yyyy}-${mm}-${dd}`;
-                      document.getElementById("dataFimConsulta").value = todayDate;
-
-                      let firstDayMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-                      let ddFirst = ("0" + firstDayMonth.getDate()).slice(-2);
-                      let mmFirst = ("0" + (firstDayMonth.getMonth() + 1)).slice(-2);
-                      let yyyyFirst = firstDayMonth.getFullYear();
-                      let firstDayMonthDate = `${yyyyFirst}-${mmFirst}-${ddFirst}`;
-                      document.getElementById("dataInicioConsulta").value = firstDayMonthDate;
-                    } else if (value == 6) {
-                      let today = new Date();
-                      let lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-                      let lastMonthLastDay = new Date(lastMonth.getFullYear(), lastMonth.getMonth() + 1, 0);
-                      let yyyy = lastMonthLastDay.getFullYear();
-                      let mm = ("0" + (lastMonthLastDay.getMonth() + 1)).slice(-2);
-                      let dd = ("0" + lastMonthLastDay.getDate()).slice(-2);
-                      let lastMonthLastDayStr = `${yyyy}-${mm}-${dd}`;
-                      document.getElementById("dataFimConsulta").value = lastMonthLastDayStr;
-
-                      let firstDayMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-                      let ddFirst = ("0" + firstDayMonth.getDate()).slice(-2);
-                      let mmFirst = ("0" + (firstDayMonth.getMonth() + 1)).slice(-2);
-                      let yyyyFirst = firstDayMonth.getFullYear();
-                      let firstDayMonthDate = `${yyyyFirst}-${mmFirst}-${ddFirst}`;
-                      document.getElementById("dataInicioConsulta").value = firstDayMonthDate;
-                    }
-                  });
-                </script>
-
-                <!-- personalized date -->
-                <div class="mb-3">
-                  <label id="dataInicioLblConsulta" for="dataInicioConsulta" class="form-label" hidden>Data de início</label>
-                  <input type="date" class="form-control" id="dataInicioConsulta" hidden />
+          <!-- consultar operações tab -->
+          <div class="tab-pane fade" id="nav-consulta" role="tabpanel" aria-labelledby="nav-consulta-tab">
+            <!-- Information form modal (for general use in errors or success) -->
+            <div id="infConsIntervalo" class="modal fade" role="dialog">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="infConsIntervalo-modal-label">Informação - Consultar operações</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body" id="infConsIntervalo-modal-body"></div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-bs-dismiss="modal"
+                      id="infConsIntervalo-body-OKBtn">OK</button>
+                  </div>
                 </div>
-                <div class="mb-3">
-                  <label id="dataFimLblConsulta" for="dataFimConsulta" class="form-label" hidden>Data de fim</label>
-                  <input type="date" class="form-control" id="dataFimConsulta" hidden />
-                </div>
+              </div>
+            </div>
 
-                <div class="mb-3">
-                  <label for="tipoConsulta" class="form-label">Tipo</label>
-                  <select class="form-select" id="tipoConsulta">
-                    <option selected disabled></option>
-                    <option value="1">Débito</option>
-                    <option value="2">Crédito</option>
-                    <option value="3">Todos</option>
-                  </select>
-                </div>
-                <br />
-                <button type="submit" class="btn btn-primary" id="consultaRecordsBtm">Consultar</button><br /><br /><br />
-
-                <!-- table title and table -->
-                <h5 id="recordsConsultaTableTitle" style="bottom: 50px" hidden></h5>
-                <table class="table table-sm" id="recordsConsultaTable" hidden>
-                  <thead>
-                    <tr>
-                      <th>ID</th>
-                      <th>Data</th>
-                      <th>Tipo</th>
-                      <th>Valor</th>
-                      <th>Descrição</th>
-                    </tr>
-                  </thead>
-                  <tbody id="recordsConsultaTableBody"></tbody>
-                </table>
-
-                <!-- export as PDF buttons -->
-                <div class="btn-group" role="group">
-                  <button type="button" class="btn btn-primary" id="exportPDFBtn" hidden>Exportar como PDF</button>
-                </div>
-                <br /><br />
+            <div class="container col-13 mt-4">
+              <h5>Consultar operações</h5>
+              <div class="mb-3">
+                <label for="datasPredConsulta" class="form-label">Data</label>
+                <select class="form-select" id="datasPredConsulta">
+                  <option selected disabled></option>
+                  <option value="1">Hoje</option>
+                  <option value="2">Ontem</option>
+                  <option value="3">Últimos 7 dias</option>
+                  <option value="4">Últimos 30 dias</option>
+                  <option value="5">Este mês</option>
+                  <option value="6">Mês anterior</option>
+                  <option value="7">Personalizado</option>
+                </select>
               </div>
 
-              <!-- general logic consulta tab -->
+              <!-- date selector -->
               <script>
-                let responseConsulta = [];
+                $("#datasPredConsulta").change(function () {
+                  const value = document.getElementById("datasPredConsulta").value;
 
-                function getRecordsIntervalo() {
-                  // gets values from form
-                  let datainicio = document.getElementById("dataInicioConsulta").value;
-                  let datafim = document.getElementById("dataFimConsulta").value;
-                  let tipo = document.getElementById("tipoConsulta").value;
+                  if (value == 7) {
+                    document.getElementById("dataInicioLblConsulta").hidden = false;
+                    document.getElementById("dataFimLblConsulta").hidden = false;
+                    document.getElementById("dataInicioConsulta").hidden = false;
+                    document.getElementById("dataFimConsulta").hidden = false;
+                  } else {
+                    document.getElementById("dataInicioLblConsulta").hidden = true;
+                    document.getElementById("dataFimLblConsulta").hidden = true;
+                    document.getElementById("dataInicioConsulta").hidden = true;
+                    document.getElementById("dataFimConsulta").hidden = true;
+                  }
 
-                  // converts date to dd/mm/yyyy
-                  let dataInicioSplit = datainicio.split("-");
-                  let dataInicio = `${dataInicioSplit[2]}/${dataInicioSplit[1]}/${dataInicioSplit[0]}`;
+                  if (value == 1) {
+                    let today = new Date();
+                    let dd = ("0" + today.getDate()).slice(-2);
+                    let mm = ("0" + (today.getMonth() + 1)).slice(-2);
+                    let yyyy = today.getFullYear();
+                    let todayDate = `${yyyy}-${mm}-${dd}`;
+                    document.getElementById("dataInicioConsulta").value = todayDate;
+                    document.getElementById("dataFimConsulta").value = todayDate;
+                  } else if (value == 2) {
+                    let today = new Date();
+                    let dd = ("0" + (today.getDate() - 1)).slice(-2);
+                    let mm = ("0" + (today.getMonth() + 1)).slice(-2);
+                    let yyyy = today.getFullYear();
+                    let todayDate = `${yyyy}-${mm}-${dd}`;
+                    document.getElementById("dataInicioConsulta").value = todayDate;
+                    document.getElementById("dataFimConsulta").value = todayDate;
+                  } else if (value == 3) {
+                    let today = new Date();
+                    let dd = ("0" + today.getDate()).slice(-2);
+                    let mm = ("0" + (today.getMonth() + 1)).slice(-2);
+                    let yyyy = today.getFullYear();
+                    let todayDate = `${yyyy}-${mm}-${dd}`;
+                    document.getElementById("dataFimConsulta").value = todayDate;
 
-                  let dataFimSplit = datafim.split("-");
-                  let dataFim = `${dataFimSplit[2]}/${dataFimSplit[1]}/${dataFimSplit[0]}`;
+                    let sevenDaysAgo = new Date();
+                    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+                    let dd7 = ("0" + sevenDaysAgo.getDate()).slice(-2);
+                    let mm7 = ("0" + (sevenDaysAgo.getMonth() + 1)).slice(-2);
+                    let yyyy7 = sevenDaysAgo.getFullYear();
+                    let sevenDaysAgoDate = `${yyyy7}-${mm7}-${dd7}`;
+                    document.getElementById("dataInicioConsulta").value = sevenDaysAgoDate;
+                  } else if (value == 4) {
+                    let today = new Date();
+                    let dd = ("0" + today.getDate()).slice(-2);
+                    let mm = ("0" + (today.getMonth() + 1)).slice(-2);
+                    let yyyy = today.getFullYear();
+                    let todayDate = `${yyyy}-${mm}-${dd}`;
+                    document.getElementById("dataFimConsulta").value = todayDate;
 
-                  // verifies if all inputs are filled
-                  if (datainicio == "" || datafim == "" || tipo == "") {
-                    const incConsIntervaloDateModalBodyHtml = `
+                    let thirtyDaysAgo = new Date();
+                    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+                    let dd30 = ("0" + thirtyDaysAgo.getDate()).slice(-2);
+                    let mm30 = ("0" + (thirtyDaysAgo.getMonth() + 1)).slice(-2);
+                    let yyyy30 = thirtyDaysAgo.getFullYear();
+                    let thirtyDaysAgoDate = `${yyyy30}-${mm30}-${dd30}`;
+                    document.getElementById("dataInicioConsulta").value = thirtyDaysAgoDate;
+                  } else if (value == 5) {
+                    let today = new Date();
+                    let dd = ("0" + today.getDate()).slice(-2);
+                    let mm = ("0" + (today.getMonth() + 1)).slice(-2);
+                    let yyyy = today.getFullYear();
+                    let todayDate = `${yyyy}-${mm}-${dd}`;
+                    document.getElementById("dataFimConsulta").value = todayDate;
+
+                    let firstDayMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+                    let ddFirst = ("0" + firstDayMonth.getDate()).slice(-2);
+                    let mmFirst = ("0" + (firstDayMonth.getMonth() + 1)).slice(-2);
+                    let yyyyFirst = firstDayMonth.getFullYear();
+                    let firstDayMonthDate = `${yyyyFirst}-${mmFirst}-${ddFirst}`;
+                    document.getElementById("dataInicioConsulta").value = firstDayMonthDate;
+                  } else if (value == 6) {
+                    let today = new Date();
+                    let lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+                    let lastMonthLastDay = new Date(lastMonth.getFullYear(), lastMonth.getMonth() + 1, 0);
+                    let yyyy = lastMonthLastDay.getFullYear();
+                    let mm = ("0" + (lastMonthLastDay.getMonth() + 1)).slice(-2);
+                    let dd = ("0" + lastMonthLastDay.getDate()).slice(-2);
+                    let lastMonthLastDayStr = `${yyyy}-${mm}-${dd}`;
+                    document.getElementById("dataFimConsulta").value = lastMonthLastDayStr;
+
+                    let firstDayMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+                    let ddFirst = ("0" + firstDayMonth.getDate()).slice(-2);
+                    let mmFirst = ("0" + (firstDayMonth.getMonth() + 1)).slice(-2);
+                    let yyyyFirst = firstDayMonth.getFullYear();
+                    let firstDayMonthDate = `${yyyyFirst}-${mmFirst}-${ddFirst}`;
+                    document.getElementById("dataInicioConsulta").value = firstDayMonthDate;
+                  }
+                });
+              </script>
+
+              <!-- personalized date -->
+              <div class="mb-3">
+                <label id="dataInicioLblConsulta" for="dataInicioConsulta" class="form-label" hidden>Data de
+                  início</label>
+                <input type="date" class="form-control" id="dataInicioConsulta" hidden />
+              </div>
+              <div class="mb-3">
+                <label id="dataFimLblConsulta" for="dataFimConsulta" class="form-label" hidden>Data de fim</label>
+                <input type="date" class="form-control" id="dataFimConsulta" hidden />
+              </div>
+
+              <div class="mb-3">
+                <label for="tipoConsulta" class="form-label">Tipo</label>
+                <select class="form-select" id="tipoConsulta">
+                  <option selected disabled></option>
+                  <option value="1">Débito</option>
+                  <option value="2">Crédito</option>
+                  <option value="3">Todos</option>
+                </select>
+              </div>
+              <br />
+              <button type="submit" class="btn btn-primary" id="consultaRecordsBtm">Consultar</button><br /><br /><br />
+
+              <!-- table title and table -->
+              <h5 id="recordsConsultaTableTitle" style="bottom: 50px" hidden></h5>
+              <table class="table table-sm" id="recordsConsultaTable" hidden>
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Data</th>
+                    <th>Tipo</th>
+                    <th>Valor</th>
+                    <th>Descrição</th>
+                  </tr>
+                </thead>
+                <tbody id="recordsConsultaTableBody"></tbody>
+              </table>
+
+              <!-- export as PDF buttons -->
+              <div class="btn-group" role="group">
+                <button type="button" class="btn btn-primary" id="exportPDFBtn" hidden>Exportar como PDF</button>
+              </div>
+              <br /><br />
+            </div>
+
+            <!-- general logic consulta tab -->
+            <script>
+              let responseConsulta = [];
+
+              function getRecordsIntervalo() {
+                // gets values from form
+                let datainicio = document.getElementById("dataInicioConsulta").value;
+                let datafim = document.getElementById("dataFimConsulta").value;
+                let tipo = document.getElementById("tipoConsulta").value;
+
+                // converts date to dd/mm/yyyy
+                let dataInicioSplit = datainicio.split("-");
+                let dataInicio = `${dataInicioSplit[2]}/${dataInicioSplit[1]}/${dataInicioSplit[0]}`;
+
+                let dataFimSplit = datafim.split("-");
+                let dataFim = `${dataFimSplit[2]}/${dataFimSplit[1]}/${dataFimSplit[0]}`;
+
+                // verifies if all inputs are filled
+                if (datainicio == "" || datafim == "" || tipo == "") {
+                  const incConsIntervaloDateModalBodyHtml = `
                                         <h4>Erro - Campos não preenchidos</h4>
                                         <p>Não introduziu alguns dados necessários para submeter o formulário.</p>
                                         <p>Verifique os valores introduzidos e tente novamente.</p>
                                     `;
-                    const incConsIntervaloDateModalBody = document.getElementById("infConsIntervalo-modal-body");
-                    incConsIntervaloDateModalBody.innerHTML = incConsIntervaloDateModalBodyHtml;
-                    $("#infConsIntervalo").modal("show");
+                  const incConsIntervaloDateModalBody = document.getElementById("infConsIntervalo-modal-body");
+                  incConsIntervaloDateModalBody.innerHTML = incConsIntervaloDateModalBodyHtml;
+                  $("#infConsIntervalo").modal("show");
 
-                    return;
-                  }
+                  return;
+                }
 
-                  // query API for records in specified date interval and type
-                  $.ajax({
-                    url: "/api/consintervalo",
-                    method: "POST",
-                    contentType: "application/json",
-                    dataType: "json",
-                    data: JSON.stringify({
-                      dataInicio: dataInicio,
-                      dataFim: dataFim,
-                      tipo: tipo,
-                    }),
-                    success: function (response) {
-                      // if no records found in specified date interval or type
-                      if (response["data"].length == 0) {
-                        document.getElementById("recordsConsultaTable").hidden = true;
-                        document.getElementById("recordsConsultaTableBody").innerHTML = "";
-                        document.getElementById("recordsConsultaTableTitle").hidden = false;
-                        document.getElementById("recordsConsultaTableTitle").innerHTML = `Nenhum registo encontrado para o tipo ${
-                          tipo == 1 ? "Débito" : tipo == 2 ? "Crédito" : "Todos"
-                        } entre as datas ${dataInicio} e ${dataFim}.`;
-                        return;
-                      }
-
-                      // show table
-                      document.getElementById("recordsConsultaTableTitle").hidden = false;
-                      if (response["data"].length == 1) {
-                        document.getElementById("recordsConsultaTableTitle").innerHTML = `${response["data"].length} registo encontrado para o tipo ${
-                          tipo == 1 ? "Débito" : tipo == 2 ? "Crédito" : "Todos"
-                        } entre as datas ${dataInicio} e ${dataFim}.`;
-                      } else {
-                        document.getElementById("recordsConsultaTableTitle").innerHTML = `${
-                          response["data"].length
-                        } registos encontrados para o tipo ${
-                          tipo == 1 ? "Débito" : tipo == 2 ? "Crédito" : "Todos"
-                        } entre as datas ${dataInicio} e ${dataFim}.`;
-                      }
-                      document.getElementById("recordsConsultaTable").hidden = false;
-
-                      // clear table
+                // query API for records in specified date interval and type
+                $.ajax({
+                  url: "/api/consintervalo",
+                  method: "POST",
+                  contentType: "application/json",
+                  dataType: "json",
+                  data: JSON.stringify({
+                    dataInicio: dataInicio,
+                    dataFim: dataFim,
+                    tipo: tipo,
+                  }),
+                  success: function (response) {
+                    // if no records found in specified date interval or type
+                    if (response["data"].length == 0) {
+                      document.getElementById("recordsConsultaTable").hidden = true;
                       document.getElementById("recordsConsultaTableBody").innerHTML = "";
+                      document.getElementById("recordsConsultaTableTitle").hidden = false;
+                      document.getElementById("recordsConsultaTableTitle").innerHTML = `Nenhum registo encontrado para o tipo ${tipo == 1 ? "Débito" : tipo == 2 ? "Crédito" : "Todos"
+                        } entre as datas ${dataInicio} e ${dataFim}.`;
+                      return;
+                    }
 
-                      // add rows to table
-                      for (var i = 0; i < response["data"].length; i++) {
-                        var row = `<tr>
+                    // show table
+                    document.getElementById("recordsConsultaTableTitle").hidden = false;
+                    if (response["data"].length == 1) {
+                      document.getElementById("recordsConsultaTableTitle").innerHTML = `${response["data"].length} registo encontrado para o tipo ${tipo == 1 ? "Débito" : tipo == 2 ? "Crédito" : "Todos"
+                        } entre as datas ${dataInicio} e ${dataFim}.`;
+                    } else {
+                      document.getElementById("recordsConsultaTableTitle").innerHTML = `${response["data"].length
+                        } registos encontrados para o tipo ${tipo == 1 ? "Débito" : tipo == 2 ? "Crédito" : "Todos"
+                        } entre as datas ${dataInicio} e ${dataFim}.`;
+                    }
+                    document.getElementById("recordsConsultaTable").hidden = false;
+
+                    // clear table
+                    document.getElementById("recordsConsultaTableBody").innerHTML = "";
+
+                    // add rows to table
+                    for (var i = 0; i < response["data"].length; i++) {
+                      var row = `<tr>
                                                 <td>${response["data"][i]["id"]}</td>
                                                 <td>${response["data"][i]["data"]}</td>
-                                                <td>${
-                                                  response["data"][i]["tipo"] == 1 ? "Débito" : response["data"][i]["tipo"] == 2 ? "Crédito" : "Todos"
-                                                }</td>
+                                                <td>${response["data"][i]["tipo"] == 1 ? "Débito" : response["data"][i]["tipo"] == 2 ? "Crédito" : "Todos"
+                        }</td>
                                                 <td>${response["data"][i]["valor"]} €</td>
                                                 <td>${response["data"][i]["descricao"]}</td>
                                                 `;
 
-                        row += `</tr>`;
-                        document.getElementById("recordsConsultaTableBody").innerHTML += row;
+                      row += `</tr>`;
+                      document.getElementById("recordsConsultaTableBody").innerHTML += row;
 
-                        // save response to global variable for export as PDF
-                        responseConsulta = response;
-                      }
+                      // save response to global variable for export as PDF
+                      responseConsulta = response;
+                    }
 
-                      // show export as PDF button
-                      document.getElementById("exportPDFBtn").hidden = false;
-                    },
-                    error: function (xhr, status, error) {
-                      const errAPIFetchConsIntervaloModalBodyHtml = `
+                    // show export as PDF button
+                    document.getElementById("exportPDFBtn").hidden = false;
+                  },
+                  error: function (xhr, status, error) {
+                    const errAPIFetchConsIntervaloModalBodyHtml = `
                                             <h4>Erro - Problema ao enviar dados para a API</h4>
                                             <p>Ocorreu um erro interno ao enviar dados do registo para a API.</p>
                                             <p>Por favor tente novamente mais tarde. Se o problema persistir, contacte o administrador.</p>
                                             <p><b>Informação técnica:</b> ${xhr.responseText}</p>
                                         `;
-                      const errAPIFetchConsIntervaloModalBody = document.getElementById("infConsIntervalo-modal-body");
-                      errAPIFetchConsIntervaloModalBody.innerHTML = errAPIFetchConsIntervaloModalBodyHtml;
-                      $("#infConsIntervalo").modal("show");
-                    },
-                  });
-                }
+                    const errAPIFetchConsIntervaloModalBody = document.getElementById(
+                      "infConsIntervalo-modal-body");
+                    errAPIFetchConsIntervaloModalBody.innerHTML = errAPIFetchConsIntervaloModalBodyHtml;
+                    $("#infConsIntervalo").modal("show");
+                  },
+                });
+              }
 
-                function exportPDFLogic() {
-                  // getting date and type values from form
-                  let datainicio = document.getElementById("dataInicioConsulta").value;
-                  let datafim = document.getElementById("dataFimConsulta").value;
-                  let tipo = document.getElementById("tipoConsulta").value;
+              function exportPDFLogic() {
+                // getting date and type values from form
+                let datainicio = document.getElementById("dataInicioConsulta").value;
+                let datafim = document.getElementById("dataFimConsulta").value;
+                let tipo = document.getElementById("tipoConsulta").value;
 
-                  let dataInicioSplit = datainicio.split("-");
-                  let dataInicio = `${dataInicioSplit[2]}/${dataInicioSplit[1]}/${dataInicioSplit[0]}`;
-                  let dataFimSplit = datafim.split("-");
-                  let dataFim = `${dataFimSplit[2]}/${dataFimSplit[1]}/${dataFimSplit[0]}`;
+                let dataInicioSplit = datainicio.split("-");
+                let dataInicio = `${dataInicioSplit[2]}/${dataInicioSplit[1]}/${dataInicioSplit[0]}`;
+                let dataFimSplit = datafim.split("-");
+                let dataFim = `${dataFimSplit[2]}/${dataFimSplit[1]}/${dataFimSplit[0]}`;
 
-                  var doc = new jspdf.jsPDF();
+                var doc = new jspdf.jsPDF();
 
-                  // initial page information
-                  doc.setFont("helvetica", "normal");
-                  doc.setFontSize(20);
-                  doc.text("Consulta de dados", 15, 20);
-                  doc.setFontSize(10);
-                  doc.text(`Intervalo: de ${dataInicio} a ${dataFim}`, 15, 30);
-                  doc.text(`Tipo: ${tipo == 1 ? "Débito" : tipo == 2 ? "Crédito" : "Todos"}`, 15, 36);
+                // initial page information
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(20);
+                doc.text("Consulta de dados", 15, 20);
+                doc.setFontSize(10);
+                doc.text(`Intervalo: de ${dataInicio} a ${dataFim}`, 15, 30);
+                doc.text(`Tipo: ${tipo == 1 ? "Débito" : tipo == 2 ? "Crédito" : "Todos"}`, 15, 36);
 
-                  // table
-                  doc.autoTable({ margin: { top: 45 }, html: "#recordsConsultaTable" });
-
-                  // total records text below table
-                  var finalY = doc.autoTable.previous.finalY;
-                  doc.setFontSize(10);
-                  doc.text(`Total de registos: ${responseConsulta["data"].length}`, 15, finalY + 10);
-
-                  // calculate balance
-                  var totalDebito = 0;
-                  var totalCredito = 0;
-                  for (var i = 0; i < responseConsulta["data"].length; i++) {
-                    if (responseConsulta["data"][i]["tipo"] == 1) {
-                      totalDebito += parseFloat(responseConsulta["data"][i]["valor"].replace(",", "."));
-                    } else if (responseConsulta["data"][i]["tipo"] == 2) {
-                      totalCredito += parseFloat(responseConsulta["data"][i]["valor"].replace(",", "."));
-                    }
-                  }
-
-                  // show balance
-                  if (tipo == 1) {
-                    doc.text(`Total de débito: ${totalDebito.toFixed(2)} €`, 15, finalY + 22);
-                  } else if (tipo == 2) {
-                    doc.text(`Total de crédito: ${totalCredito.toFixed(2)} €`, 15, finalY + 22);
-                  } else {
-                    doc.text(`Total de débito: ${totalDebito.toFixed(2)} €`, 15, finalY + 22);
-                    doc.text(`Total de crédito: ${totalCredito.toFixed(2)} €`, 15, finalY + 28);
-                  }
-
-                  // page information footer
-                  var totalPagesExp = doc.internal.getNumberOfPages();
-                  doc.setFontSize(10);
-                  for (var i = totalPagesExp; i >= 1; i--) {
-                    doc.setPage(i);
-                    doc.text(`Página ${i} de ${totalPagesExp}`, 15, doc.internal.pageSize.height - 10);
-                  }
-
-                  // date and hour footer
-                  var today = new Date();
-                  var dd = today.getDate();
-                  var mm = today.getMonth() + 1;
-                  var yyyy = today.getFullYear();
-                  if (dd < 10) {
-                    dd = "0" + dd;
-                  } else if (mm < 10) {
-                    mm = "0" + mm;
-                  }
-                  var todayDate = dd + "/" + mm + "/" + yyyy;
-
-                  var hh = today.getHours();
-                  var min = today.getMinutes();
-                  var sec = today.getSeconds();
-                  if (hh < 10) {
-                    hh = "0" + hh;
-                  } else if (min < 10) {
-                    min = "0" + min;
-                  } else if (sec < 10) {
-                    sec = "0" + sec;
-                  }
-                  var todayHour = hh + ":" + min + ":" + sec;
-
-                  var message = "Pedido efetuado a " + todayDate + " às " + todayHour;
-                  doc.text(message, doc.internal.pageSize.width - 80, doc.internal.pageSize.height - 10);
-
-                  // export PDF as consulta_dd-mm-yyyy_hh-mm-ss.pdf
-                  doc.save(`consulta_${todayDate}_${todayHour}.pdf`);
-                }
-
-                // consulta button listener
-                var submitted = false;
-                $("#consultaRecordsBtm").click(function () {
-                  submitted = true;
-                  getRecordsIntervalo();
+                // table
+                doc.autoTable({
+                  margin: {
+                    top: 45
+                  },
+                  html: "#recordsConsultaTable"
                 });
 
-                // detects if form fields get changed and disables all results, titles and export buttons
-                $("form :input").change(function () {
-                  if (submitted) {
-                    document.getElementById("recordsConsultaTable").hidden = true;
-                    document.getElementById("recordsConsultaTableBody").innerHTML = "";
-                    document.getElementById("recordsConsultaTableTitle").hidden = true;
-                    document.getElementById("exportPDFBtn").hidden = true;
-                  }
-                });
+                // total records text below table
+                var finalY = doc.autoTable.previous.finalY;
+                doc.setFontSize(10);
+                doc.text(`Total de registos: ${responseConsulta["data"].length}`, 15, finalY + 10);
 
-                // export as PDF button listener
-                $("#exportPDFBtn").click(function () {
-                  exportPDFLogic();
+                // calculate balance
+                var totalDebito = 0;
+                var totalCredito = 0;
+                for (var i = 0; i < responseConsulta["data"].length; i++) {
+                  if (responseConsulta["data"][i]["tipo"] == 1) {
+                    totalDebito += parseFloat(responseConsulta["data"][i]["valor"].replace(",", "."));
+                  } else if (responseConsulta["data"][i]["tipo"] == 2) {
+                    totalCredito += parseFloat(responseConsulta["data"][i]["valor"].replace(",", "."));
+                  }
+                }
+
+                // show balance
+                if (tipo == 1) {
+                  doc.text(`Total de débito: ${totalDebito.toFixed(2)} €`, 15, finalY + 22);
+                } else if (tipo == 2) {
+                  doc.text(`Total de crédito: ${totalCredito.toFixed(2)} €`, 15, finalY + 22);
+                } else {
+                  doc.text(`Total de débito: ${totalDebito.toFixed(2)} €`, 15, finalY + 22);
+                  doc.text(`Total de crédito: ${totalCredito.toFixed(2)} €`, 15, finalY + 28);
+                }
+
+                // page information footer
+                var totalPagesExp = doc.internal.getNumberOfPages();
+                doc.setFontSize(10);
+                for (var i = totalPagesExp; i >= 1; i--) {
+                  doc.setPage(i);
+                  doc.text(`Página ${i} de ${totalPagesExp}`, 15, doc.internal.pageSize.height - 10);
+                }
+
+                // date and hour footer
+                var today = new Date();
+                var dd = today.getDate();
+                var mm = today.getMonth() + 1;
+                var yyyy = today.getFullYear();
+                if (dd < 10) {
+                  dd = "0" + dd;
+                } else if (mm < 10) {
+                  mm = "0" + mm;
+                }
+                var todayDate = dd + "/" + mm + "/" + yyyy;
+
+                var hh = today.getHours();
+                var min = today.getMinutes();
+                var sec = today.getSeconds();
+                if (hh < 10) {
+                  hh = "0" + hh;
+                } else if (min < 10) {
+                  min = "0" + min;
+                } else if (sec < 10) {
+                  sec = "0" + sec;
+                }
+                var todayHour = hh + ":" + min + ":" + sec;
+
+                var message = "Pedido efetuado a " + todayDate + " às " + todayHour;
+                doc.text(message, doc.internal.pageSize.width - 80, doc.internal.pageSize.height - 10);
+
+                // export PDF as consulta_dd-mm-yyyy_hh-mm-ss.pdf
+                doc.save(`consulta_${todayDate}_${todayHour}.pdf`);
+              }
+
+              // consulta button listener
+              var submitted = false;
+              $("#consultaRecordsBtm").click(function () {
+                submitted = true;
+                getRecordsIntervalo();
+              });
+
+              // detects if form fields get changed and disables all results, titles and export buttons
+              $("form :input").change(function () {
+                if (submitted) {
+                  document.getElementById("recordsConsultaTable").hidden = true;
+                  document.getElementById("recordsConsultaTableBody").innerHTML = "";
+                  document.getElementById("recordsConsultaTableTitle").hidden = true;
+                  document.getElementById("exportPDFBtn").hidden = true;
+                }
+              });
+
+              // export as PDF button listener
+              $("#exportPDFBtn").click(function () {
+                exportPDFLogic();
+              });
+            </script>
+          </div>
+
+          <!-- definições tab -->
+          <div class="tab-pane fade" id="nav-definicoes" role="tabpanel" aria-labelledby="nav-definicoes-tab">
+            <div class="container col-13 mt-4">
+              <h5>Definições</h5>
+              <div class="form-check form-switch dark-mode-switch">
+                <input class="form-check-input" type="checkbox" id="dark-mode-switch" />
+                <label class="form-check-label" for="dark-mode-switch">Modo escuro</label>
+              </div>
+              <script>
+                const darkModeSwitch = $("#dark-mode-switch");
+                darkModeSwitch.click(function () {
+                  const isLight = document.body.dataset.bsTheme === "light";
+                  const isDark = document.body.dataset.bsTheme === "dark";
+                  const isSwitchedOn = darkModeSwitch.prop("checked");
+                  const isSwitchedOff = !isSwitchedOn;
+                  localStorage.setItem("darkMode", isSwitchedOn);
+                  document.body.dataset.bsTheme = isSwitchedOn ? "dark" : "light";
                 });
               </script>
-            </div>
-
-            <!-- definições tab -->
-            <div class="tab-pane fade" id="nav-definicoes" role="tabpanel" aria-labelledby="nav-definicoes-tab">
-              <div class="container col-13 mt-4">
-                <h5>Definições</h5>
-                <div class="form-check form-switch dark-mode-switch">
-                  <input class="form-check-input" type="checkbox" id="dark-mode-switch" />
-                  <label class="form-check-label" for="dark-mode-switch">Modo escuro</label>
-                </div>
-                <script>
-                  const darkModeSwitch = $("#dark-mode-switch");
-                  darkModeSwitch.click(function () {
-                    const isLight = document.body.dataset.bsTheme === "light";
-                    const isDark = document.body.dataset.bsTheme === "dark";
-                    const isSwitchedOn = darkModeSwitch.prop("checked");
-                    const isSwitchedOff = !isSwitchedOn;
-                    localStorage.setItem("darkMode", isSwitchedOn);
-                    document.body.dataset.bsTheme = isSwitchedOn ? "dark" : "light";
-                  });
-                </script>
-              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <script>
-      // general needed functions to be used in all tabs
-      $(document).ready(function () {
-        var lastTab = localStorage.getItem("lastTab");
-        lastTab ? $("#" + lastTab).tab("show") : $("#nav-tab a:first").tab("show");
-        $('a[data-bs-toggle="tab"]').on("shown.bs.tab", function (e) {
-          localStorage.setItem("lastTab", $(e.target).attr("id"));
-        });
+    <br /><br />
+  </div>
+  <script>
+    // general needed functions to be used in all tabs
+    $(document).ready(function () {
+      var lastTab = localStorage.getItem("lastTab");
+      lastTab ? $("#" + lastTab).tab("show") : $("#nav-tab a:first").tab("show");
+      $('a[data-bs-toggle="tab"]').on("shown.bs.tab", function (e) {
+        localStorage.setItem("lastTab", $(e.target).attr("id"));
       });
-      $(document).ready(function () {
-        var darkMode = localStorage.getItem("darkMode");
-        if (darkMode === "true") {
-          $("#dark-mode-switch").prop("checked", true);
-          document.body.dataset.bsTheme = "dark";
-        } else {
-          document.body.dataset.bsTheme = "light";
-        }
-      });
-      $(document).ready(function () {
-        const postingRecord = localStorage.getItem("postingRecord");
-        if (postingRecord === "success") {
-          console.log("Last success on posting data");
-          const jsonData = JSON.parse(localStorage.getItem("postingRecordData"));
-          const successBody = `
+    });
+    $(document).ready(function () {
+      var darkMode = localStorage.getItem("darkMode");
+      if (darkMode === "true") {
+        $("#dark-mode-switch").prop("checked", true);
+        document.body.dataset.bsTheme = "dark";
+      } else {
+        document.body.dataset.bsTheme = "light";
+      }
+    });
+    $(document).ready(function () {
+      const postingRecord = localStorage.getItem("postingRecord");
+      if (postingRecord === "success") {
+        console.log("Last success on posting data");
+        const jsonData = JSON.parse(localStorage.getItem("postingRecordData"));
+        const successBody = `
                     <h4>Registo efetuado com sucesso</h4>
                     <p>O registo foi efetuado com sucesso.</p><br\>
                     <p><b>Dados adicionais: </b></p>
@@ -1374,15 +1369,15 @@
                         <li><b>ID do registo:</b> ${jsonData.idRecord}</li>
                     </ul>
                 `;
-          const successModalBody = document.getElementById("inf-modal-body");
-          successModalBody.innerHTML = successBody;
-          $("#informationForm").modal("show");
-          localStorage.removeItem("postingRecord");
-          localStorage.removeItem("postingRecordData");
-        } else if (postingRecord === "fail") {
-          console.log("Last fail on posting data");
-          const errorData = JSON.parse(localStorage.getItem("postingRecordData"));
-          const errorBody = `
+        const successModalBody = document.getElementById("inf-modal-body");
+        successModalBody.innerHTML = successBody;
+        $("#informationForm").modal("show");
+        localStorage.removeItem("postingRecord");
+        localStorage.removeItem("postingRecordData");
+      } else if (postingRecord === "fail") {
+        console.log("Last fail on posting data");
+        const errorData = JSON.parse(localStorage.getItem("postingRecordData"));
+        const errorBody = `
                     <h4>Erro ao efetuar registo</h4>
                     <p>O registo não pode ser efetuado devido a um erro no servidor. Por favor, tente novamente mais tarde.</p>
                     <p>Se o erro persistir, contacte o administrador.</p><br\>
@@ -1393,28 +1388,27 @@
                         <li><b>Erro: </b>${errorData.detail.errorData}</li>
                     </ul>
                 `;
-          const errorModalBody = document.getElementById("inf-modal-body");
-          errorModalBody.innerHTML = errorBody;
-          $("#informationForm").modal("show");
-          localStorage.removeItem("postingRecord");
-          localStorage.removeItem("postingRecordData");
-        }
-      });
-      $(document).ready(function () {
-        const editRecordNext = localStorage.getItem("editRecordNext");
-        if (editRecordNext === "getRecords") {
-          console.log("Last success on editing record");
-          const editRecordNextDate = localStorage.getItem("editRecordNextDate");
-          getRecords(editRecordNextDate);
-          localStorage.removeItem("editRecordNext");
-          localStorage.removeItem("editRecordNextDate");
-        }
-      });
-    </script>
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
-      crossorigin="anonymous"
-    ></script>
-  </body>
+        const errorModalBody = document.getElementById("inf-modal-body");
+        errorModalBody.innerHTML = errorBody;
+        $("#informationForm").modal("show");
+        localStorage.removeItem("postingRecord");
+        localStorage.removeItem("postingRecordData");
+      }
+    });
+    $(document).ready(function () {
+      const editRecordNext = localStorage.getItem("editRecordNext");
+      if (editRecordNext === "getRecords") {
+        console.log("Last success on editing record");
+        const editRecordNextDate = localStorage.getItem("editRecordNextDate");
+        getRecords(editRecordNextDate);
+        localStorage.removeItem("editRecordNext");
+        localStorage.removeItem("editRecordNextDate");
+      }
+    });
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous">
+  </script>
+</body>
+
 </html>

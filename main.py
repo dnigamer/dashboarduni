@@ -11,7 +11,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 
 from modules.logger import Logger
 
-import mysql.connector
+from sqlalchemy import create_engine
 import json
 
 log: Logger = Logger(headerEnabled=False)
@@ -20,23 +20,25 @@ with open("secrets.json", "r") as f:
     secrets = json.loads(f.read())
     f.close()
 
-db = mysql.connector.connect(
-    host=secrets["host"],
+engine = create_engine('mysql+mysqlconnector://{user}:{password}@{host}:{port}/{database}'.format(
     user=secrets["login"],
     password=secrets["password"],
-    database=secrets["database"],
-)
+    host=secrets["host"],
+    port=secrets["port"],
+    database=secrets["database"]
+))
 
-cursor = db.cursor()
-
-if db.is_connected():
+# connect to the database
+try:
+    db = engine.raw_connection()
     log.light_green("database", "Connected to MySQL database")
+    cursor = db.cursor()
     cursor.execute(
         f"CREATE TABLE IF NOT EXISTS `{secrets['database']}`.`registos` (`id` INT NOT NULL AUTO_INCREMENT, `data` TEXT NOT NULL, `valor` FLOAT NOT NULL DEFAULT '0.0', `tipo` FLOAT NOT NULL DEFAULT '0.0', `descricao` TEXT NOT NULL DEFAULT '', PRIMARY KEY (`id`)) ENGINE = InnoDB;"
     )
-else:
-    log.red("database", "Failed to connect to MySQL database")
-
+except Exception as e:
+    log.red("database", "Failed to connect to MySQL database: " + str(e))
+    exit(1)
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
@@ -58,6 +60,7 @@ async def saldo_api():
     except Exception as e:
         raise HTTPException(
             status_code=500,
+            headers={"Content-Type": "application/json; charset=utf-8"},
             detail={
                 "httpCode": 500,
                 "httpState": "Internal Server Error",
@@ -67,7 +70,8 @@ async def saldo_api():
 
     return JSONResponse(
         status_code=200,
-        content={"httpCode": 200, "httpState": "OK", "saldo": saldo},
+        headers={"Content-Type": "application/json; charset=utf-8"},
+        content={"httpCode": 200, "httpState": "OK", "saldo": saldo}
     )
 
 
@@ -80,6 +84,7 @@ async def registar_api(request: Request):
     if data["valor"] == "" or data["tipo"] == "" or data["data"] == "":
         raise HTTPException(
             status_code=400,
+            headers={"Content-Type": "application/json; charset=utf-8"},
             detail={
                 "httpCode": 400,
                 "httpState": "Bad Request",
@@ -97,6 +102,7 @@ async def registar_api(request: Request):
     except Exception as e:
         raise HTTPException(
             status_code=500,
+            headers={"Content-Type": "application/json; charset=utf-8"},
             detail={
                 "httpCode": 500,
                 "httpState": "Internal Server Error",
@@ -107,6 +113,7 @@ async def registar_api(request: Request):
     cursor.execute("SELECT id FROM registos ORDER BY id DESC LIMIT 1")
     return JSONResponse(
         status_code=200,
+        headers={"Content-Type": "application/json; charset=utf-8"},
         content={"httpCode": 200, "httpState": "OK", "idRecord": cursor.fetchone()[0]},
     )
 
@@ -119,6 +126,7 @@ async def editar_api(request: Request, id: int):
     if data["valor"] == "" or data["tipo"] == "" or data["data"] == "":
         raise HTTPException(
             status_code=400,
+            headers={"Content-Type": "application/json; charset=utf-8"},
             detail={
                 "httpCode": 400,
                 "httpState": "Bad Request",
@@ -136,6 +144,7 @@ async def editar_api(request: Request, id: int):
     except Exception as e:
         raise HTTPException(
             status_code=500,
+            headers={"Content-Type": "application/json; charset=utf-8"},
             detail={
                 "httpCode": 500,
                 "httpState": "Internal Server Error",
@@ -146,6 +155,7 @@ async def editar_api(request: Request, id: int):
 
     return JSONResponse(
         status_code=200,
+        headers={"Content-Type": "application/json; charset=utf-8"},
         content={"httpCode": 200, "httpState": "OK", "data": data},
     )
 
@@ -173,6 +183,7 @@ async def consultar_api(request: Request):
     except Exception as e:
         raise HTTPException(
             status_code=500,
+            headers={"Content-Type": "application/json; charset=utf-8"},
             detail={
                 "httpCode": 500,
                 "httpState": "Internal Server Error",
@@ -182,6 +193,7 @@ async def consultar_api(request: Request):
 
     return JSONResponse(
         status_code=200,
+        headers={"Content-Type": "application/json; charset=utf-8"},
         content={"httpCode": 200, "httpState": "OK", "data": jsondata},
     )
 
@@ -208,6 +220,7 @@ async def consultar_single_api(id: int):
     except Exception as e:
         raise HTTPException(
             status_code=500,
+            headers={"Content-Type": "application/json; charset=utf-8"},
             detail={
                 "httpCode": 500,
                 "httpState": "Internal Server Error",
@@ -217,6 +230,7 @@ async def consultar_single_api(id: int):
 
     return JSONResponse(
         status_code=200,
+        headers={"Content-Type": "application/json; charset=utf-8"},
         content={"httpCode": 200, "httpState": "OK", "data": jsondata},
     )
 
@@ -232,6 +246,7 @@ async def apagar_api(id: int):
     except Exception as e:
         raise HTTPException(
             status_code=500,
+            headers={"Content-Type": "application/json; charset=utf-8"},
             detail={
                 "httpCode": 500,
                 "httpState": "Internal Server Error",
@@ -241,6 +256,7 @@ async def apagar_api(id: int):
 
     return JSONResponse(
         status_code=200,
+        headers={"Content-Type": "application/json; charset=utf-8"},
         content={"httpCode": 200, "httpState": "OK"},
     )
 
@@ -276,6 +292,7 @@ async def consultar_intervalo_api(request: Request):
     except Exception as e:
         raise HTTPException(
             status_code=500,
+            headers={"Content-Type": "application/json; charset=utf-8"},
             detail={
                 "httpCode": 500,
                 "httpState": "Internal Server Error",
@@ -285,5 +302,6 @@ async def consultar_intervalo_api(request: Request):
 
     return JSONResponse(
         status_code=200,
-        content={"httpCode": 200, "httpState": "OK", "data": jsondata},
+        headers={"Content-Type": "application/json; charset=utf-8"},
+        content={"httpCode": 200, "httpState": "OK", "data": jsondata}
     )
