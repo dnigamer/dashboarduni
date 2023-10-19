@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  web:
+    build: .
+    container_name: dashboarduni
+    ports:
+      - "8000:8000"
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
