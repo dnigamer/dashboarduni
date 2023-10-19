@@ -4,6 +4,7 @@ Dashboard Gastos
 
 """
 
+from datetime import datetime
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -20,13 +21,15 @@ with open("secrets.json", "r") as f:
     secrets = json.loads(f.read())
     f.close()
 
-engine = create_engine('mysql+mysqlconnector://{user}:{password}@{host}:{port}/{database}'.format(
-    user=secrets["login"],
-    password=secrets["password"],
-    host=secrets["host"],
-    port=secrets["port"],
-    database=secrets["database"]
-))
+engine = create_engine(
+    "mysql+mysqlconnector://{user}:{password}@{host}:{port}/{database}".format(
+        user=secrets["login"],
+        password=secrets["password"],
+        host=secrets["host"],
+        port=secrets["port"],
+        database=secrets["database"],
+    )
+)
 
 # connect to the database
 try:
@@ -38,18 +41,51 @@ try:
     )
 except Exception as e:
     log.red("database", "Failed to connect to MySQL database: " + str(e))
-    exit(1)
+
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
+# Middleware
+# Define the middleware function
 
+
+async def log_requests(request: Request, call_next):
+    now = datetime.now()
+    if request.headers.get("x-real-ip") == None:
+        realIP = "0.0.0.0"
+    else:
+        realIP = request.headers.get("x-real-ip")
+    try:
+        cursor.execute(
+            "INSERT INTO `dashgastos`.hits (date, IP, `real-IP`, method, path, useragent) VALUES (%s, %s, %s, %s, %s, %s)",
+            (
+                now.strftime("%d/%m/%Y %H:%M:%S"),
+                request.client.host,
+                realIP,
+                request.method,
+                request.url.path,
+                request.headers.get("user-agent"),
+            ),
+        )
+        db.commit()
+    except Exception as e:
+        log.red("database", "Failed to save log to MySQL database: " + str(e))
+    response = await call_next(request)
+    return response
+
+
+app.middleware("http")(log_requests)
+
+
+# Site principal
 @app.get("/hi", response_class=HTMLResponse)
 async def root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 
+# API Saldo
 @app.get("/api/saldo", response_class=JSONResponse)
 async def saldo_api():
     try:
@@ -71,10 +107,11 @@ async def saldo_api():
     return JSONResponse(
         status_code=200,
         headers={"Content-Type": "application/json; charset=utf-8"},
-        content={"httpCode": 200, "httpState": "OK", "saldo": saldo}
+        content={"httpCode": 200, "httpState": "OK", "saldo": saldo},
     )
 
 
+# API Registo debito/crédito
 @app.post("/api/registar", response_class=JSONResponse)
 async def registar_api(request: Request):
     data = await request.json()
@@ -118,6 +155,7 @@ async def registar_api(request: Request):
     )
 
 
+# API Editar registo por ID
 @app.put("/api/editar/{id}", response_class=JSONResponse)
 async def editar_api(request: Request, id: int):
     data = await request.json()
@@ -160,6 +198,8 @@ async def editar_api(request: Request, id: int):
     )
 
 
+# API Consultar registo
+# (usado por editar registo para obter lista de registos numa data)
 @app.post("/api/consulta", response_class=JSONResponse)
 async def consultar_api(request: Request):
     data = await request.json()
@@ -172,13 +212,15 @@ async def consultar_api(request: Request):
 
         jsondata = []
         for i in range(len(registos)):
-            jsondata.append({
+            jsondata.append(
+                {
                     "id": registos[i][0],
                     "data": str(registos[i][1]),
                     "valor": str(registos[i][2]),
                     "tipo": registos[i][3],
                     "descricao": str(registos[i][4]),
-                })
+                }
+            )
 
     except Exception as e:
         raise HTTPException(
@@ -198,24 +240,93 @@ async def consultar_api(request: Request):
     )
 
 
+# API Consultar registo por ID
 @app.post("/api/consulta/{id}", response_class=JSONResponse)
-async def consultar_single_api(id: int):
+async def consultar_single_api(request: Request, id):
+    if id == "intervalo":
+        data = await request.json()
 
+        try:
+            if data["tipo"] == "3":
+                cursor.execute(
+                    "SELECT * FROM registos WHERE STR_TO_DATE(data, '%d/%m/%Y') BETWEEN STR_TO_DATE(%s, '%d/%m/%Y') AND STR_TO_DATE(%s, '%d/%m/%Y') AND (tipo = 1 OR tipo = 2) ORDER BY STR_TO_DATE(data, '%d/%m/%Y') ASC",
+                    (
+                        data["dataInicio"],
+                        data["dataFim"],
+                    ),
+                )
+            else:
+                cursor.execute(
+                    "SELECT * FROM registos WHERE STR_TO_DATE(data, '%d/%m/%Y') BETWEEN STR_TO_DATE(%s, '%d/%m/%Y') AND STR_TO_DATE(%s, '%d/%m/%Y') AND tipo = %s ORDER BY STR_TO_DATE(data, '%d/%m/%Y') ASC",
+                    (
+                        data["dataInicio"],
+                        data["dataFim"],
+                        data["tipo"],
+                    ),
+                )
+
+            registos = cursor.fetchall()
+
+            jsondata = []
+            for i in range(len(registos)):
+                jsondata.append(
+                    {
+                        "id": registos[i][0],
+                        "data": str(registos[i][1]),
+                        "valor": str(registos[i][2]),
+                        "tipo": registos[i][3],
+                        "descricao": str(registos[i][4]),
+                    }
+                )
+
+        except Exception as e:
+            raise HTTPException(
+                status_code=500,
+                headers={"Content-Type": "application/json; charset=utf-8"},
+                detail={
+                    "httpCode": 500,
+                    "httpState": "Internal Server Error",
+                    "errorData": str(e),
+                },
+            )
+
+        return JSONResponse(
+            status_code=200,
+            headers={"Content-Type": "application/json; charset=utf-8"},
+            content={"httpCode": 200, "httpState": "OK", "data": jsondata},
+        )
+
+    # parse id to int
+    try:
+        id = int(id)
+    except Exception as e:
+        raise HTTPException(
+            status_code=400,
+            headers={"Content-Type": "application/json; charset=utf-8"},
+            detail={
+                "httpCode": 400,
+                "httpState": "Bad Request",
+                "errorData": "Invalid id.",
+            },
+        )
     try:
         cursor.execute(
-            "SELECT * FROM registos WHERE `id` = %s;", (id, ),
+            "SELECT * FROM registos WHERE `id` = %s;",
+            (id,),
         )
         registos = cursor.fetchall()
 
         jsondata = []
         for i in range(len(registos)):
-            jsondata.append({
+            jsondata.append(
+                {
                     "id": registos[i][0],
                     "data": str(registos[i][1]),
                     "valor": str(registos[i][2]),
                     "tipo": registos[i][3],
                     "descricao": str(registos[i][4]),
-                })
+                }
+            )
 
     except Exception as e:
         raise HTTPException(
@@ -235,11 +346,13 @@ async def consultar_single_api(id: int):
     )
 
 
+# API Apagar registo por ID
 @app.delete("/api/apagar/{id}", response_class=JSONResponse)
 async def apagar_api(id: int):
     try:
         cursor.execute(
-            "DELETE FROM registos WHERE `id` = %s;", (id, ),
+            "DELETE FROM registos WHERE `id` = %s;",
+            (id,),
         )
         db.commit()
 
@@ -258,50 +371,4 @@ async def apagar_api(id: int):
         status_code=200,
         headers={"Content-Type": "application/json; charset=utf-8"},
         content={"httpCode": 200, "httpState": "OK"},
-    )
-
-
-@app.post("/api/consintervalo", response_class=JSONResponse)
-async def consultar_intervalo_api(request: Request):
-    data = await request.json()
-
-    try:
-        if data["tipo"] == "3":
-            cursor.execute(
-                "SELECT * FROM registos WHERE STR_TO_DATE(data, '%d/%m/%Y') BETWEEN STR_TO_DATE(%s, '%d/%m/%Y') AND STR_TO_DATE(%s, '%d/%m/%Y') AND (tipo = 1 OR tipo = 2) ORDER BY STR_TO_DATE(data, '%d/%m/%Y') ASC", 
-                (data["dataInicio"], data["dataFim"], )
-            )
-        else:
-            cursor.execute(
-                "SELECT * FROM registos WHERE STR_TO_DATE(data, '%d/%m/%Y') BETWEEN STR_TO_DATE(%s, '%d/%m/%Y') AND STR_TO_DATE(%s, '%d/%m/%Y') AND tipo = %s ORDER BY STR_TO_DATE(data, '%d/%m/%Y') ASC", 
-                (data["dataInicio"], data["dataFim"], data["tipo"], )
-            )
-        
-        registos = cursor.fetchall()
-
-        jsondata = []
-        for i in range(len(registos)):
-            jsondata.append({
-                    "id": registos[i][0],
-                    "data": str(registos[i][1]),
-                    "valor": str(registos[i][2]),
-                    "tipo": registos[i][3],
-                    "descricao": str(registos[i][4]),
-                })
-
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            headers={"Content-Type": "application/json; charset=utf-8"},
-            detail={
-                "httpCode": 500,
-                "httpState": "Internal Server Error",
-                "errorData": str(e),
-            },
-        )
-
-    return JSONResponse(
-        status_code=200,
-        headers={"Content-Type": "application/json; charset=utf-8"},
-        content={"httpCode": 200, "httpState": "OK", "data": jsondata}
     )
