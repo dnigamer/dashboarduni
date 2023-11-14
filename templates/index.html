@@ -232,6 +232,11 @@
               </div>
 
               <div class="mb-3">
+                <label for="fatura-id" class="form-label">ID fatura</label>
+                <input type="text" class="form-control" id="fatura-id" />
+              </div>
+
+              <div class="mb-3">
                 <label for="tipo" class="form-label">Tipo</label>
                 <select class="form-select" id="tipo">
                   <option selected disabled></option>
@@ -253,7 +258,6 @@
                   $("#datePicker").attr("value", today);
                 </script>
               </div>
-              <br />
 
               <script>
                 // if enter is pressed, submit form
@@ -264,6 +268,8 @@
                   }
                 });
               </script>
+
+              <br />
               <button type="button" class="btn btn-primary" id="submeterRegisto">Submeter entrada</button>
               <br /><br />
 
@@ -306,6 +312,7 @@
                 function showSummary() {
                   let valor = document.getElementById("valor").value;
                   let descricao = document.getElementById("descricao").value;
+                  let fatura_id = document.getElementById("fatura-id").value;
                   let tipo = document.getElementById("tipo").value;
 
                   let dataBefore = document.getElementById("datePicker").value;
@@ -368,6 +375,7 @@
                   const summary = `
                                             <p><b>Valor:</b> ${valor}</p>
                                             <p><b>Descrição:</b> ${descricao}</p>
+                                            <p><b>ID fatura:</b> ${fatura_id}</p>
                                             <p><b>Tipo:</b> ${tipo === "1" ? "Débito" : "Crédito"}</p>
                                             <p><b>Data:</b> ${data}</p>
                                             <br\>
@@ -383,6 +391,7 @@
                   let valorStr = document.getElementById("valor").value;
                   let valor = parseFloat(valorStr.replace(" €", "").replace(",", "."));
                   let descricao = document.getElementById("descricao").value;
+                  let fatura_id = document.getElementById("fatura-id").value;
                   let tipo = parseFloat(document.getElementById("tipo").value);
 
                   let dataBefore = document.getElementById("datePicker").value;
@@ -400,6 +409,7 @@
                       descricao: descricao,
                       tipo: tipo,
                       data: data,
+                      fatura_id: fatura_id,
                     }),
                     success: function (request, text) {
                       // if success, reload page showing success modal
