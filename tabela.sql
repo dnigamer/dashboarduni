@@ -5,8 +5,16 @@ CREATE TABLE IF NOT EXISTS `dashgastos`.`registos` (
   `valor` FLOAT NOT NULL DEFAULT '0.0',
   `tipo` INT NOT NULL DEFAULT '0',
   `descricao` TEXT NOT NULL DEFAULT '',
+  `fatura_id` TEXT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE = InnoDB;
+
+ALTER TABLE
+  `registos`
+ADD
+  `fatura_id` TEXT NULL
+AFTER
+  `descricao`;
 
 -- get saldo
 SELECT
