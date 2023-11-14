@@ -80,7 +80,7 @@ app.middleware("http")(log_requests)
 
 
 # Site principal
-@app.get("/hi", response_class=HTMLResponse)
+@app.get("/home", response_class=HTMLResponse)
 async def root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
