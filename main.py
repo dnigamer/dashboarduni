@@ -37,7 +37,7 @@ try:
     log.light_green("database", "Connected to MySQL database")
     cursor = db.cursor()
     cursor.execute(
-        f"CREATE TABLE IF NOT EXISTS `{secrets['database']}`.`registos` (`id` INT NOT NULL AUTO_INCREMENT, `data` TEXT NOT NULL, `valor` FLOAT NOT NULL DEFAULT '0.0', `tipo` FLOAT NOT NULL DEFAULT '0.0', `descricao` TEXT NOT NULL DEFAULT '', PRIMARY KEY (`id`)) ENGINE = InnoDB;"
+        f"CREATE TABLE IF NOT EXISTS `{secrets['database']}`.`registos` (`id` INT NOT NULL AUTO_INCREMENT, `data` TEXT NOT NULL, `valor` FLOAT NOT NULL DEFAULT '0.0', `tipo` FLOAT NOT NULL DEFAULT '0.0', `descricao` TEXT NOT NULL DEFAULT '', `fatura_id` TEXT NULL, PRIMARY KEY (`id`)) ENGINE = InnoDB;"
     )
 except Exception as e:
     log.red("database", "Failed to connect to MySQL database: " + str(e))
@@ -131,8 +131,8 @@ async def registar_api(request: Request):
 
     try:
         cursor.execute(
-            "INSERT INTO registos (data, valor, tipo, descricao) VALUES (%s, %s, %s, %s)",
-            (data["data"], data["valor"], data["tipo"], data["descricao"]),
+            "INSERT INTO registos (data, valor, tipo, descricao, fatura_id) VALUES (%s, %s, %s, %s, %s)",
+            (data["data"], data["valor"], data["tipo"], data["descricao"], data["fatura_id"]),
         )
         # fmt: on
         db.commit()
@@ -174,8 +174,8 @@ async def editar_api(request: Request, id: int):
     
     try:
         cursor.execute(
-            "UPDATE registos SET data = %s, valor = %s, tipo = %s, descricao = %s WHERE id = %s",
-            (data["data"], data["valor"], data["tipo"], data["descricao"], id),
+            "UPDATE registos SET data = %s, valor = %s, tipo = %s, descricao = %s, fatura_id = %s WHERE id = %s",
+            (data["data"], data["valor"], data["tipo"], data["descricao"], data["fatura_id"], id),
         )
         # fmt: on
         db.commit()
@@ -219,6 +219,7 @@ async def consultar_api(request: Request):
                     "valor": str(registos[i][2]),
                     "tipo": registos[i][3],
                     "descricao": str(registos[i][4]),
+                    "fatura_id": str(registos[i][5]),
                 }
             )
 
@@ -276,6 +277,7 @@ async def consultar_single_api(request: Request, id):
                         "valor": str(registos[i][2]),
                         "tipo": registos[i][3],
                         "descricao": str(registos[i][4]),
+                        "fatura_id": str(registos[i][5]),
                     }
                 )
 
@@ -325,6 +327,7 @@ async def consultar_single_api(request: Request, id):
                     "valor": str(registos[i][2]),
                     "tipo": registos[i][3],
                     "descricao": str(registos[i][4]),
+                    "fatura_id": str(registos[i][5]),
                 }
             )
 
