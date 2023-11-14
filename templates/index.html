@@ -459,6 +459,11 @@
               </div>
               <br />
 
+              <div class="mb-3">
+                <button type="submit" class="btn btn-primary" id="dataEditBtn">Procurar registos</button>
+              </div>
+              <br /><br />
+
               <h5 id="editTableTitle" hidden></h5>
               <table class="table table-sm" id="editTable" hidden>
                 <thead>
@@ -466,6 +471,7 @@
                     <th>ID</th>
                     <th>Valor</th>
                     <th>Descrição</th>
+                    <th>ID fatura</th>
                     <th>Tipo</th>
                     <th>Data</th>
                     <th></th>
@@ -476,9 +482,6 @@
                   <tr></tr>
                 </tbody>
               </table>
-
-              <button type="submit" class="btn btn-primary" id="dataEditBtn">Procurar registos</button>
-              <br /><br />
 
               <script>
                 function getRecords(dateParam) {
@@ -546,6 +549,7 @@
                                         <td>${response["data"][i]["id"]}</td>
                                         <td>${response["data"][i]["valor"]} €</td>
                                         <td>${response["data"][i]["descricao"]}</td>
+                                        <td>${response["data"][i]["fatura_id"] == "None" ? "-" : response["data"][i]["fatura_id"]}</td>
                                         <td>${response["data"][i]["tipo"] == 1 ? "Débito" : "Crédito"}</td>
                                         <td>${response["data"][i]["data"]}</td>
                                         <td><button type="button" class="btn btn-acoes-editar" onclick="editRecord(${response["data"][i]["id"]})">
@@ -604,6 +608,12 @@
                       const numberParsBefore = parseFloat(valorBefore.replace(",", "."));
 
                       const descricaoBefore = response["data"][0]["descricao"];
+
+                      if (response["data"][0]["fatura_id"] == "None") {
+                        response["data"][0]["fatura_id"] = "";
+                      }
+                      const idFaturaBefore = response["data"][0]["fatura_id"];
+
                       const tipoBefore = response["data"][0]["tipo"];
 
                       const dataBefore = response["data"][0]["data"];
@@ -614,6 +624,7 @@
                       $("#trueEditModal-body-valorEdit").val(`${numberParsBefore.toFixed(2)} €`.replace(/^0+/,
                         ""));
                       $("#trueEditModal-body-descricaoEdit").val(descricaoBefore);
+                      $("#trueEditModal-body-idFaturaEdit").val(idFaturaBefore);
                       $("#trueEditModal-body-tipoEdit").val(tipoBefore);
                       $("#trueEditModal-body-dataEdit").val(dataParsEdit);
 
@@ -624,6 +635,8 @@
                         const idEdit = document.getElementById("trueEditModal-body-idEdit").value;
                         const valorEditBefore = document.getElementById("trueEditModal-body-valorEdit").value;
                         const descricaoEdit = document.getElementById("trueEditModal-body-descricaoEdit")
+                          .value;
+                        const idFaturaEdit = document.getElementById("trueEditModal-body-idFaturaEdit")
                           .value;
                         const tipoEdit = document.getElementById("trueEditModal-body-tipoEdit").value;
 
@@ -702,6 +715,7 @@
                           data: JSON.stringify({
                             valor: valorEditAfter,
                             descricao: descricaoEdit,
+                            fatura_id: idFaturaEdit,
                             tipo: tipoEdit,
                             data: dataEdit,
                           }),
@@ -888,6 +902,11 @@
                       <div class="mb-3">
                         <label for="trueEditModal-body-descricaoEdit" class="form-label">Descrição</label>
                         <input type="text" class="form-control" id="trueEditModal-body-descricaoEdit" />
+                      </div>
+
+                      <div class="mb-3">
+                        <label for="trueEditModal-body-idFaturaEdit" class="form-label">ID fatura</label>
+                        <input type="text" class="form-control" id="trueEditModal-body-idFaturaEdit" />
                       </div>
 
                       <div class="mb-3">
@@ -1088,9 +1107,10 @@
                   <tr>
                     <th>ID</th>
                     <th>Data</th>
-                    <th>Tipo</th>
                     <th>Valor</th>
+                    <th>Tipo</th>
                     <th>Descrição</th>
+                    <th>ID fatura</th>
                   </tr>
                 </thead>
                 <tbody id="recordsConsultaTableBody"></tbody>
@@ -1176,11 +1196,11 @@
                       var row = `<tr>
                                                 <td>${response["data"][i]["id"]}</td>
                                                 <td>${response["data"][i]["data"]}</td>
-                                                <td>${response["data"][i]["tipo"] == 1 ? "Débito" : response["data"][i]["tipo"] == 2 ? "Crédito" : "Todos"
-                        }</td>
                                                 <td>${response["data"][i]["valor"]} €</td>
+                                                <td>${response["data"][i]["tipo"] == 1 ? "Débito" : response["data"][i]["tipo"] == 2 ? "Crédito" : "Todos"}</td>
                                                 <td>${response["data"][i]["descricao"]}</td>
-                                                `;
+                                                <td>${response["data"][i]["fatura_id"] == "None" ? "-" : response["data"][i]["fatura_id"]}</td>
+                                               `;
 
                       row += `</tr>`;
                       document.getElementById("recordsConsultaTableBody").innerHTML += row;
