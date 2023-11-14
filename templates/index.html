@@ -199,6 +199,21 @@
           <div class="tab-pane fade" id="nav-registar" role="tabpanel" aria-labelledby="nav-registar-tab">
             <div class="container col-13 mt-4">
               <h5>Registar débito/crédito</h5>
+
+              <div class="mb-3">
+                <label for="data" class="form-label">Data</label>
+                <input type="date" class="form-control" id="datePicker" />
+                <script>
+                  // sets date to today's date
+                  var today = new Date();
+                  var dd = ("0" + today.getDate()).slice(-2);
+                  var mm = ("0" + (today.getMonth() + 1)).slice(-2);
+                  var yyyy = today.getFullYear();
+                  today = yyyy + "-" + mm + "-" + dd;
+                  $("#datePicker").attr("value", today);
+                </script>
+              </div>
+
               <div class="mb-3">
                 <label for="valor" class="form-label">Valor</label>
                 <input type="text" class="form-control" id="valor" placeholder="0.00 €" />
@@ -227,16 +242,6 @@
               </div>
 
               <div class="mb-3">
-                <label for="descricao" class="form-label">Descrição</label>
-                <input type="text" class="form-control" id="descricao" />
-              </div>
-
-              <div class="mb-3">
-                <label for="fatura-id" class="form-label">ID fatura</label>
-                <input type="text" class="form-control" id="fatura-id" />
-              </div>
-
-              <div class="mb-3">
                 <label for="tipo" class="form-label">Tipo</label>
                 <select class="form-select" id="tipo">
                   <option selected disabled></option>
@@ -246,17 +251,13 @@
               </div>
 
               <div class="mb-3">
-                <label for="data" class="form-label">Data</label>
-                <input type="date" class="form-control" id="datePicker" />
-                <script>
-                  // sets date to today's date
-                  var today = new Date();
-                  var dd = ("0" + today.getDate()).slice(-2);
-                  var mm = ("0" + (today.getMonth() + 1)).slice(-2);
-                  var yyyy = today.getFullYear();
-                  today = yyyy + "-" + mm + "-" + dd;
-                  $("#datePicker").attr("value", today);
-                </script>
+                <label for="descricao" class="form-label">Descrição</label>
+                <input type="text" class="form-control" id="descricao" />
+              </div>
+
+              <div class="mb-3">
+                <label for="fatura-id" class="form-label">ID fatura</label>
+                <input type="text" class="form-control" id="fatura-id" />
               </div>
 
               <script>
@@ -373,11 +374,11 @@
 
                   // show summary form for final confirmation
                   const summary = `
+                                            <p><b>Data:</b> ${data}</p>
                                             <p><b>Valor:</b> ${valor}</p>
+                                            <p><b>Tipo:</b> ${tipo === "1" ? "Débito" : "Crédito"}</p>
                                             <p><b>Descrição:</b> ${descricao}</p>
                                             <p><b>ID fatura:</b> ${fatura_id}</p>
-                                            <p><b>Tipo:</b> ${tipo === "1" ? "Débito" : "Crédito"}</p>
-                                            <p><b>Data:</b> ${data}</p>
                                             <br\>
                                             <p>Confirma o registo?</p>
                                         `;
@@ -469,11 +470,11 @@
                 <thead>
                   <tr>
                     <th>ID</th>
+                    <th>Data</th>
                     <th>Valor</th>
+                    <th>Tipo</th>
                     <th>Descrição</th>
                     <th>ID fatura</th>
-                    <th>Tipo</th>
-                    <th>Data</th>
                     <th></th>
                     <th></th>
                   </tr>
@@ -547,11 +548,12 @@
                       for (var i = 0; i < response["data"].length; i++) {
                         var row = `<tr>
                                         <td>${response["data"][i]["id"]}</td>
+                                        <td>${response["data"][i]["data"]}</td>
                                         <td>${response["data"][i]["valor"]} €</td>
+                                        <td>${response["data"][i]["tipo"] == 1 ? "Débito" : "Crédito"}</td>
                                         <td>${response["data"][i]["descricao"]}</td>
                                         <td>${response["data"][i]["fatura_id"] == "None" ? "-" : response["data"][i]["fatura_id"]}</td>
-                                        <td>${response["data"][i]["tipo"] == 1 ? "Débito" : "Crédito"}</td>
-                                        <td>${response["data"][i]["data"]}</td>
+
                                         <td><button type="button" class="btn btn-acoes-editar" onclick="editRecord(${response["data"][i]["id"]})">
                                             <svg
                                                 xmlns="http://www.w3.org/2000/svg" width="14" height="14"
@@ -869,6 +871,11 @@
                       </div>
 
                       <div class="mb-3">
+                        <label for="trueEditModal-body-dataEdit" class="form-label">Data</label>
+                        <input type="date" class="form-control" id="trueEditModal-body-dataEdit" />
+                      </div>
+
+                      <div class="mb-3">
                         <label for="trueEditModal-body-valorEdit" class="form-label">Valor</label>
                         <input type="text" class="form-control" id="trueEditModal-body-valorEdit"
                           placeholder="0.00 €" />
@@ -900,16 +907,6 @@
                       </div>
 
                       <div class="mb-3">
-                        <label for="trueEditModal-body-descricaoEdit" class="form-label">Descrição</label>
-                        <input type="text" class="form-control" id="trueEditModal-body-descricaoEdit" />
-                      </div>
-
-                      <div class="mb-3">
-                        <label for="trueEditModal-body-idFaturaEdit" class="form-label">ID fatura</label>
-                        <input type="text" class="form-control" id="trueEditModal-body-idFaturaEdit" />
-                      </div>
-
-                      <div class="mb-3">
                         <label for="trueEditModal-body-tipoEdit" class="form-label">Tipo</label>
                         <select class="form-select" id="trueEditModal-body-tipoEdit">
                           <option selected disabled></option>
@@ -919,8 +916,13 @@
                       </div>
 
                       <div class="mb-3">
-                        <label for="trueEditModal-body-dataEdit" class="form-label">Data</label>
-                        <input type="date" class="form-control" id="trueEditModal-body-dataEdit" />
+                        <label for="trueEditModal-body-descricaoEdit" class="form-label">Descrição</label>
+                        <input type="text" class="form-control" id="trueEditModal-body-descricaoEdit" />
+                      </div>
+
+                      <div class="mb-3">
+                        <label for="trueEditModal-body-idFaturaEdit" class="form-label">ID fatura</label>
+                        <input type="text" class="form-control" id="trueEditModal-body-idFaturaEdit" />
                       </div>
 
                       <script>
