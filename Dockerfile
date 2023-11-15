@@ -19,4 +19,4 @@ RUN chmod +x /app/./run.sh
 
 EXPOSE 8000
 
-CMD ["/app/./run.sh"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
