@@ -3,6 +3,8 @@ name: Create and publish Docker image
 on:
   pull_request:
     branches: [ "release" ]
+  push:
+    branches: [ "release" ]
 
 env:
   REGISTRY: ghcr.io
@@ -40,5 +42,5 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/dnigamer/${{ IMAGE_NAME }}:latest
+          tags: ghcr.io/dnigamer/${{ env.IMAGE_NAME }}:latest
           labels: ${{ steps.meta.outputs.labels }}
