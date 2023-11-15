@@ -42,4 +42,4 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
 
     env:
-      REGISTRY_URL: https://ghcr.io
+      REGISTRY_URL: ghcr.io
