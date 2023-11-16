@@ -14,12 +14,25 @@ from modules.logger import Logger
 
 from sqlalchemy import create_engine
 import json
+import os
 
 log: Logger = Logger(headerEnabled=False)
 
-with open("secrets.json", "r") as f:
-    secrets = json.loads(f.read())
-    f.close()
+secrets = {
+    "host": os.environ.get("DB_HOST"),
+    "port": os.environ.get("DB_PORT"),
+    "login": os.environ.get("DB_LOGIN"),
+    "password": os.environ.get("DB_PASSWORD"),
+    "database": os.environ.get("DB_DATABASE"),
+}
+
+if any([secrets[x] is None for x in secrets]):
+    log.red("error", "Not all secrets are set.")
+    log.red(
+        "error",
+        "Program will not start without them. Please check if you have set all the environment variables.",
+    )
+    exit(1)
 
 engine = create_engine(
     "mysql+mysqlconnector://{user}:{password}@{host}:{port}/{database}".format(
