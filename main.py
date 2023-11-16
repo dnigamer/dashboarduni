@@ -8,7 +8,7 @@ from datetime import datetime
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 
 from modules.logger import Logger
 
@@ -77,6 +77,12 @@ async def log_requests(request: Request, call_next):
 
 
 app.middleware("http")(log_requests)
+
+
+# Route / to /home
+@app.get("/", response_class=HTMLResponse)
+async def rootfr(request: Request):
+    return RedirectResponse("/home", status_code=301)
 
 
 # Site principal
