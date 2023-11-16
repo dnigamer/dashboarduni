@@ -1,15 +1,12 @@
-FROM --platform=amd64 python:3.9.18-slim-bullseye AS base-image
+FROM --platform=amd64 python:3.12-slim AS base-image
 
 FROM base-image as linux-packages
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-    build-essential \
-    libpq-dev \
     python3-dev \
     python3-pip \
     python3-setuptools \
-    python3-wheel \
-    && rm -rf /var/lib/apt/lists/*
+    python3-wheel
 
 FROM linux-packages as copy-files
 WORKDIR /app
