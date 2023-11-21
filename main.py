@@ -13,7 +13,7 @@ from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from modules.logger import Logger
 
 from sqlalchemy import create_engine
-import json
+from sqlalchemy.pool import QueuePool
 import os
 
 log: Logger = Logger(headerEnabled=False)
@@ -41,7 +41,11 @@ engine = create_engine(
         host=secrets["host"],
         port=secrets["port"],
         database=secrets["database"],
-    )
+    ),
+    poolclass=QueuePool,
+    pool_size=5,
+    max_overflow=0,
+    pool_recycle=3600,
 )
 
 # connect to the database
