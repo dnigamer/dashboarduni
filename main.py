@@ -52,6 +52,7 @@ engine = create_engine(
     pool_size=5,
     max_overflow=0,
     pool_recycle=3600,
+    pool_pre_ping=True,  # check connection before using it from pool (avoids "Broken Pipe" errors)
 )
 
 # connect to the database
