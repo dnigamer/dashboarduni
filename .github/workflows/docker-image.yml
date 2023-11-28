@@ -35,7 +35,7 @@ jobs:
       - name: Get version label from Dockerfile
         id: version
         run: |
-          VERSION=$(grep -oP 'LABEL version=\K[^ ]+' Dockerfile)
+          VERSION=$(grep -m1 'LABEL VERSION[^"]' Dockerfile | cut -d "=" -d \" -f2)
           echo "::set-output name=version::$VERSION"
 
       - name: Build and push Docker image
