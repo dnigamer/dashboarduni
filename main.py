@@ -3,6 +3,10 @@ Dashboard Gastos
 (c) 2023 by DniGamer @dnigamer
 
 """
+# Version: 1.8.0
+# Date: 2023-11-28
+
+CODE_VERSION = "1.8.0"
 
 from datetime import datetime
 from fastapi import FastAPI, Request, HTTPException
@@ -17,6 +21,8 @@ from sqlalchemy.pool import QueuePool
 import os
 
 log: Logger = Logger(headerEnabled=False)
+
+log.blue("starting", "Dashboard Gastos v" + CODE_VERSION)
 
 secrets = {
     "host": os.environ.get("DB_HOST"),

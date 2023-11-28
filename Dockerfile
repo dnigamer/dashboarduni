@@ -1,5 +1,10 @@
 FROM --platform=amd64 python:3.12-slim AS base-image
 
+LABEL VERSION="1.8.0"
+LABEL MAINTAINER="DniGamer <dnigamerofficial@gmail.com>"
+LABEL DESCRIPTION="Dockerfile for the dashboarduni repository."
+LABEL REPOSITORY="https://github.com/dnigamer/dashboarduni"
+
 FROM base-image as linux-packages
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
