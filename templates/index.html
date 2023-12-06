@@ -67,13 +67,6 @@
                 today = yyyy + "-" + mm + "-" + dd;
                 $("#datePicker").attr("value", today);
               } else if (target == "#nav-editar") {
-                var today = new Date();
-                var dd = ("0" + today.getDate()).slice(-2);
-                var mm = ("0" + (today.getMonth() + 1)).slice(-2);
-                var yyyy = today.getFullYear();
-                today = yyyy + "-" + mm + "-" + dd;
-                $("#datePickerEdit").attr("value", today);
-                $("#editTableTitle").text("");
                 document.getElementById("editTableTitle").hidden = true;
                 document.getElementById("editTable").hidden = true;
               } else if (target == "#nav-consulta") {
@@ -447,23 +440,134 @@
               <h5>Editar registo</h5>
               <div class="mb-3">
                 <label for="datePickerEdit" class="form-label">Data</label>
-                <input type="date" class="form-control" id="datePickerEdit" />
-                <script>
-                  // sets date to today's date
-                  var today = new Date();
-                  var dd = ("0" + today.getDate()).slice(-2);
-                  var mm = ("0" + (today.getMonth() + 1)).slice(-2);
-                  var yyyy = today.getFullYear();
-                  today = yyyy + "-" + mm + "-" + dd;
-                  $("#datePickerEdit").attr("value", today);
-                </script>
+                <div class="mb-3">
+                  <select class="form-select" id="datePickerEdit">
+                    <option selected disabled></option>
+                    <option value="1">Hoje</option>
+                    <option value="2">Ontem</option>
+                    <option value="3">Últimos 7 dias</option>
+                    <option value="4">Últimos 30 dias</option>
+                    <option value="5">Este mês</option>
+                    <option value="6">Mês anterior</option>
+                    <option value="7">Personalizado</option>
+                  </select>
+                </div>
               </div>
+
+              <!-- personalized date -->
+              <div class="mb-3">
+                <label id="dataInicioLblEdit" for="dataInicioEdit" class="form-label" hidden>Data de
+                  início</label>
+                <input type="date" class="form-control" id="dataInicioEdit" hidden />
+              </div>
+              <div class="mb-3">
+                <label id="dataFimLblEdit" for="dataFimEdit" class="form-label" hidden>Data de fim</label>
+                <input type="date" class="form-control" id="dataFimEdit" hidden />
+              </div>
+
+
+              <!-- date selector -->
+              <script>
+                $("#datePickerEdit").change(function () {
+                  var datePickerValueEdit = document.getElementById("datePickerEdit").value;
+
+                  if (datePickerValueEdit == 7) {
+                    document.getElementById("dataInicioLblEdit").hidden = false;
+                    document.getElementById("dataFimLblEdit").hidden = false;
+                    document.getElementById("dataInicioEdit").hidden = false;
+                    document.getElementById("dataFimEdit").hidden = false;
+                  } else {
+                    document.getElementById("dataInicioLblEdit").hidden = true;
+                    document.getElementById("dataFimLblEdit").hidden = true;
+                    document.getElementById("dataInicioEdit").hidden = true;
+                    document.getElementById("dataFimEdit").hidden = true;
+                  }
+
+                  if (datePickerValueEdit == 1) {
+                    let today = new Date();
+                    let dd = ("0" + today.getDate()).slice(-2);
+                    let mm = ("0" + (today.getMonth() + 1)).slice(-2);
+                    let yyyy = today.getFullYear();
+                    let todayDate = `${yyyy}-${mm}-${dd}`;
+                    document.getElementById("dataInicioEdit").value = todayDate;
+                    document.getElementById("dataFimEdit").value = todayDate;
+                  } else if (datePickerValueEdit == 2) {
+                    let today = new Date();
+                    let dd = ("0" + (today.getDate() - 1)).slice(-2);
+                    let mm = ("0" + (today.getMonth() + 1)).slice(-2);
+                    let yyyy = today.getFullYear();
+                    let todayDate = `${yyyy}-${mm}-${dd}`;
+                    document.getElementById("dataInicioEdit").value = todayDate;
+                    document.getElementById("dataFimEdit").value = todayDate;
+                  } else if (datePickerValueEdit == 3) {
+                    let today = new Date();
+                    let dd = ("0" + today.getDate()).slice(-2);
+                    let mm = ("0" + (today.getMonth() + 1)).slice(-2);
+                    let yyyy = today.getFullYear();
+                    let todayDate = `${yyyy}-${mm}-${dd}`;
+                    document.getElementById("dataFimEdit").value = todayDate;
+
+                    let sevenDaysAgo = new Date();
+                    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+                    let dd7 = ("0" + sevenDaysAgo.getDate()).slice(-2);
+                    let mm7 = ("0" + (sevenDaysAgo.getMonth() + 1)).slice(-2);
+                    let yyyy7 = sevenDaysAgo.getFullYear();
+                    let sevenDaysAgoDate = `${yyyy7}-${mm7}-${dd7}`;
+                    document.getElementById("dataInicioEdit").value = sevenDaysAgoDate;
+                  } else if (datePickerValueEdit == 4) {
+                    let today = new Date();
+                    let dd = ("0" + today.getDate()).slice(-2);
+                    let mm = ("0" + (today.getMonth() + 1)).slice(-2);
+                    let yyyy = today.getFullYear();
+                    let todayDate = `${yyyy}-${mm}-${dd}`;
+                    document.getElementById("dataFimEdit").value = todayDate;
+
+                    let thirtyDaysAgo = new Date();
+                    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+                    let dd30 = ("0" + thirtyDaysAgo.getDate()).slice(-2);
+                    let mm30 = ("0" + (thirtyDaysAgo.getMonth() + 1)).slice(-2);
+                    let yyyy30 = thirtyDaysAgo.getFullYear();
+                    let thirtyDaysAgoDate = `${yyyy30}-${mm30}-${dd30}`;
+                    document.getElementById("dataInicioEdit").value = thirtyDaysAgoDate;
+                  } else if (datePickerValueEdit == 5) {
+                    let today = new Date();
+                    let dd = ("0" + today.getDate()).slice(-2);
+                    let mm = ("0" + (today.getMonth() + 1)).slice(-2);
+                    let yyyy = today.getFullYear();
+                    let todayDate = `${yyyy}-${mm}-${dd}`;
+                    document.getElementById("dataFimEdit").value = todayDate;
+
+                    let firstDayMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+                    let ddFirst = ("0" + firstDayMonth.getDate()).slice(-2);
+                    let mmFirst = ("0" + (firstDayMonth.getMonth() + 1)).slice(-2);
+                    let yyyyFirst = firstDayMonth.getFullYear();
+                    let firstDayMonthDate = `${yyyyFirst}-${mmFirst}-${ddFirst}`;
+                    document.getElementById("dataInicioEdit").value = firstDayMonthDate;
+                  } else if (datePickerValueEdit == 6) {
+                    let today = new Date();
+                    let lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+                    let lastMonthLastDay = new Date(lastMonth.getFullYear(), lastMonth.getMonth() + 1, 0);
+                    let yyyy = lastMonthLastDay.getFullYear();
+                    let mm = ("0" + (lastMonthLastDay.getMonth() + 1)).slice(-2);
+                    let dd = ("0" + lastMonthLastDay.getDate()).slice(-2);
+                    let lastMonthLastDayStr = `${yyyy}-${mm}-${dd}`;
+                    document.getElementById("dataFimEdit").value = lastMonthLastDayStr;
+
+                    let firstDayMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+                    let ddFirst = ("0" + firstDayMonth.getDate()).slice(-2);
+                    let mmFirst = ("0" + (firstDayMonth.getMonth() + 1)).slice(-2);
+                    let yyyyFirst = firstDayMonth.getFullYear();
+                    let firstDayMonthDate = `${yyyyFirst}-${mmFirst}-${ddFirst}`;
+                    document.getElementById("dataInicioEdit").value = firstDayMonthDate;
+                  }
+                });
+              </script>
               <br />
 
               <div class="mb-3">
                 <button type="submit" class="btn btn-primary" id="dataEditBtn">Procurar registos</button>
               </div>
-              <br /><br />
+              <br />
 
               <h5 id="editTableTitle" hidden></h5>
               <table class="table table-sm" id="editTable" hidden>
@@ -486,20 +590,21 @@
 
               <script>
                 function getRecords(dateParam) {
-                  let dataBefore = document.getElementById("datePickerEdit").value;
-                  let dataSplit = dataBefore.split("-");
-                  let dataEdit = `${dataSplit[2]}/${dataSplit[1]}/${dataSplit[0]}`;
+                  let datainicio = document.getElementById("dataInicioEdit").value;
+                  let datafim = document.getElementById("dataFimEdit").value;
 
-                  if (dateParam != undefined) {
-                    let dataEdit = dateParam;
-                  }
+                  let dataInicioSplit = datainicio.split("-");
+                  let dataInicio = `${dataInicioSplit[2]}/${dataInicioSplit[1]}/${dataInicioSplit[0]}`;
+
+                  let dataFimSplit = datafim.split("-");
+                  let dataFim = `${dataFimSplit[2]}/${dataFimSplit[1]}/${dataFimSplit[0]}`;
 
                   // check if data is empty and if so show a modal
-                  if (dataBefore == "") {
+                  if (datainicio == "" || datafim == "" ) {
                     const incDateModalBodyHtml = `
                                                 <h4>Erro - Valor de data inválido</h4>
                                                 <p>O valor introduzido para a data é inválido.</p>
-                                                <p>Verifique os valores introduzidos e tente novamente.</p>
+                                                <p>Verifique os valores introduzidos e tente novamente. ME</p>
                                             `;
                     const incDateModalBody = document.getElementById("infEditModal-modal-body");
                     incDateModalBody.innerHTML = incDateModalBodyHtml;
@@ -510,21 +615,29 @@
 
                   // query API first to check if there are any records for the date
                   $.ajax({
-                    url: "/api/consulta",
+                    url: "/api/consulta/intervalo",
                     method: "POST",
                     contentType: "application/json",
                     dataType: "json",
                     data: JSON.stringify({
-                      dataConsulta: dataEdit,
+                      dataInicio: dataInicio,
+                      dataFim: dataFim,
+                      tipo: "3"
                     }),
                     success: function (response) {
+                      console.log(response["data"].length)
                       // if no records, show message in a title below button
                       if (response["data"].length == 0) {
                         document.getElementById("editTable").hidden = true;
                         document.getElementById("recordsTableBody").innerHTML = "";
                         document.getElementById("editTableTitle").hidden = false;
-                        document.getElementById("editTableTitle").innerHTML =
-                          `Nenhum registo encontrado para a data ${dataEdit}.`;
+                        if (dateParam == 1 || dateParam == 2) {
+                          document.getElementById("editTableTitle").innerHTML =
+                            `Nenhum registo encontrado para o dia ${dataInicio}.`;
+                        } else {
+                          document.getElementById("editTableTitle").innerHTML =
+                            `Nenhum registo encontrado entre as datas ${dataInicio} e ${dataFim}.`;
+                        }
                         return;
                       }
 
@@ -533,11 +646,11 @@
                       if (response["data"].length == 1) {
                         document.getElementById(
                           "editTableTitle"
-                        ).innerHTML = `${response["data"].length} registo encontrado para a data ${dataEdit}.`;
+                        ).innerHTML = `${response["data"].length} registo encontrado entre as datas ${dataInicio} e ${dataFim}.`;
                       } else {
                         document.getElementById(
                           "editTableTitle"
-                        ).innerHTML = `${response["data"].length} registos encontrados para a data ${dataEdit}.`;
+                        ).innerHTML = `${response["data"].length} registos encontrados entre as datas ${dataInicio} e ${dataFim}.`;
                       }
                       document.getElementById("editTable").hidden = false;
 
@@ -606,21 +719,21 @@
                     success: function (response) {
                       let finish = false;
 
-                      const valorBefore = response["data"][0]["valor"];
-                      const numberParsBefore = parseFloat(valorBefore.replace(",", "."));
+                      let valorBefore = response["data"][0]["valor"];
+                      let numberParsBefore = parseFloat(valorBefore.replace(",", "."));
 
-                      const descricaoBefore = response["data"][0]["descricao"];
+                      let descricaoBefore = response["data"][0]["descricao"];
 
                       if (response["data"][0]["fatura_id"] == "None") {
                         response["data"][0]["fatura_id"] = "";
                       }
-                      const idFaturaBefore = response["data"][0]["fatura_id"];
+                      let idFaturaBefore = response["data"][0]["fatura_id"];
 
-                      const tipoBefore = response["data"][0]["tipo"];
+                      let tipoBefore = response["data"][0]["tipo"];
 
-                      const dataBefore = response["data"][0]["data"];
-                      const dataBeforeSplit = dataBefore.split("/");
-                      const dataParsEdit = `${dataBeforeSplit[2]}-${dataBeforeSplit[1]}-${dataBeforeSplit[0]}`;
+                      let dataBefore = response["data"][0]["data"];
+                      let dataBeforeSplit = dataBefore.split("/");
+                      let dataParsEdit = `${dataBeforeSplit[2]}-${dataBeforeSplit[1]}-${dataBeforeSplit[0]}`;
 
                       $("#trueEditModal-body-idEdit").val(id);
                       $("#trueEditModal-body-valorEdit").val(`${numberParsBefore.toFixed(2)} €`.replace(/^0+/,
@@ -634,17 +747,17 @@
 
                       $("#trueEditModal-body-submitEdit").click(function () {
                         // gets values from form
-                        const idEdit = document.getElementById("trueEditModal-body-idEdit").value;
-                        const valorEditBefore = document.getElementById("trueEditModal-body-valorEdit").value;
-                        const descricaoEdit = document.getElementById("trueEditModal-body-descricaoEdit")
+                        let idEdit = document.getElementById("trueEditModal-body-idEdit").value;
+                        let valorEditBefore = document.getElementById("trueEditModal-body-valorEdit").value;
+                        let descricaoEdit = document.getElementById("trueEditModal-body-descricaoEdit")
                           .value;
-                        const idFaturaEdit = document.getElementById("trueEditModal-body-idFaturaEdit")
+                        let idFaturaEdit = document.getElementById("trueEditModal-body-idFaturaEdit")
                           .value;
-                        const tipoEdit = document.getElementById("trueEditModal-body-tipoEdit").value;
+                        let tipoEdit = document.getElementById("trueEditModal-body-tipoEdit").value;
 
                         var dataBefore = document.getElementById("trueEditModal-body-dataEdit").value;
-                        const dataSplit = dataBefore.split("-");
-                        const dataEdit = `${dataSplit[2]}/${dataSplit[1]}/${dataSplit[0]}`;
+                        let dataSplit = dataBefore.split("-");
+                        let dataEdit = `${dataSplit[2]}/${dataSplit[1]}/${dataSplit[0]}`;
 
                         $("#infEditModal-body-OKBtn").click(function () {
                           if (finish != true) $("#trueEditModal").modal("show");
@@ -736,7 +849,9 @@
 
                             $("#infEditModal-body-OKBtn").click(function () {
                               localStorage.setItem("editRecordNext", "getRecords");
-                              localStorage.setItem("editRecordNextDate", dataEdit);
+                              localStorage.setItem("editRecordParamDate", document.getElementById("datePickerEdit").value);
+                              localStorage.setItem("editRecordInicioDate", document.getElementById("dataInicioEdit").value);
+                              localStorage.setItem("editRecordFimDate", document.getElementById("dataFimEdit").value);
                               location.reload();
                             });
                           },
@@ -815,7 +930,8 @@
                 }
 
                 $("#dataEditBtn").click(function () {
-                  getRecords();
+                  var datePickerValueEdit = document.getElementById("datePickerEdit").value;
+                  getRecords(datePickerValueEdit);
                 });
               </script>
             </div>
@@ -1443,8 +1559,12 @@
       const editRecordNext = localStorage.getItem("editRecordNext");
       if (editRecordNext === "getRecords") {
         console.log("Last success on editing record");
-        const editRecordNextDate = localStorage.getItem("editRecordNextDate");
-        getRecords(editRecordNextDate);
+        document.getElementById("datePickerEdit").value = localStorage.getItem("editRecordParamDate");
+        document.getElementById("dataInicioEdit").value = localStorage.getItem("editRecordInicioDate");
+        document.getElementById("dataFimEdit").value = localStorage.getItem("editRecordFimDate");
+
+        getRecords();
+        localStorage.removeItem("editRecordParamDate");
         localStorage.removeItem("editRecordNext");
         localStorage.removeItem("editRecordNextDate");
       }
